@@ -4,16 +4,15 @@ import Icon from 'react-native-vector-icons/dist/Ionicons'
 import MyButton from './MyButton.js'
 
 export default function TimerButtons(props){
-	const [timerState,setTimerState] = useState('stop')
-
-	const stop = () =>{
-		setTimerState('stop')
+	const {state,play,stop,pause} = props
+	const onStop = () =>{
+		stop()
 	}
-	const play = () =>{
-		setTimerState('play')
+	const onPlay = () =>{
+		play()
 	}
-	const pause = () =>{
-		setTimerState('pause')
+	const onPause = () =>{
+		pause()
 	}
 	const pressedStyle = pressed =>[{
 		borderRadius:60,
@@ -23,16 +22,16 @@ export default function TimerButtons(props){
 
 	return (
 		<View style = {styles.btnRow}>
-			<MyButton style={({pressed})=>pressedStyle(pressed)} press = {pause} >
-				{((timerState !== 'pause') && (timerState === 'play')) && 
+			<MyButton style={({pressed})=>pressedStyle(pressed)} press = {onPause} >
+				{((state !== 'pause') && (state === 'play')) && 
 					<Icon name = 'pause' size = {100} color='#009ddc' />}
 			</MyButton>
-			<MyButton style = {({pressed})=>pressedStyle(pressed)} press = {play}>
-				{!(timerState === 'play') &&
+			<MyButton style = {({pressed})=>pressedStyle(pressed)} press = {onPlay}>
+				{!(state === 'play') &&
 					<Icon name = 'play' size = {100} color='#009ddc' />}
 			</MyButton>
-			<MyButton style = {({pressed})=>pressedStyle(pressed)} press = {stop}>
-				{(timerState !== 'stop') && 
+			<MyButton style = {({pressed})=>pressedStyle(pressed)} press = {onStop}>
+				{(state !== 'stop') && 
 					<Icon name = 'stop' size = {100} color='#009ddc' />}
 			</MyButton>
 		</View>

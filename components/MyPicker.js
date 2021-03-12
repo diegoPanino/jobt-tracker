@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/dist/Ionicons'
 
 export default function MyPicker(props){
 	const {values,onValueChange,selectValue} = props
-	const {icon=true,iconStyle={},textStyle={},pickeItemStyle={},xOffset=0,yOffset=0,menuStyle={},containerStyle={}} = props
+	const {icon=true,iconStyle={},textStyle={},pickerItemStyle={},xOffset=0,yOffset=0,menuStyle={},containerStyle={}} = props
 	const [dropMenu,setDropMenu] = useState(false)
 	const [selectedItem,setSelectedItem] = useState(selectValue)
 	const [x,setX] = useState()
@@ -23,7 +23,7 @@ export default function MyPicker(props){
 
 	const MyPickerItems = values.map((el,i)=>{
 		return (
-			<TouchableOpacity style = {[{height:height},styles.pickerItem,pickeItemStyle]} key = {i} onPress = {()=>selectItem(el)}>
+			<TouchableOpacity style = {[{height:height},styles.pickerItem,pickerItemStyle]} key = {i} onPress = {()=>selectItem(el)}>
 				<Text style = {textStyle}>{el}</Text>						
 			</TouchableOpacity>
 		)
@@ -86,7 +86,7 @@ const styles=StyleSheet.create({
 	},
 	textContainer:{
 		flex:10,
-		alignItems:'center'
+		alignItems:'center',
 	},
 	icoContainer:{
 		flex:1,

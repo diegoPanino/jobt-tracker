@@ -1,30 +1,40 @@
 import React,{useState,useEffect} from 'react'
-import {SafeAreaView,View,Text,StyleSheet} from 'react-native'
+import {SafeAreaView,View,StyleSheet} from 'react-native'
+import {connect} from 'react-redux'
+import Timer from '../components/Timer.js'
 import TimerButtons from '../components/TimerButtons.js'
 import MyPicker from '../components/MyPicker.js'
+import MyText from '../components/MyText.js'
 
-export default function TimerScreen(){
+function TimerScreen({jobs}){
 	const [timerState,setTimerState] = useState('stop')
+	const [selectedJob,setSelectedJob] = useState(null)
+	const jobList=jobs.map(job => {return job.name})
+	
 	useEffect(()=>{
-		console.log(timerState)
-	})
-
+		setTimerState('stop')
+	},[selectedJob])
+	
 	return (
 		<SafeAreaView style = {styles.safeArea}>
 			<View style = {styles.mainView}>
 				<View style = {styles.pickerContainer}>
-					<MyPicker values = {['Job1','Josssssssss2','Job3']} onValueChange = {(val)=>console.log(val)} selectValue = 'Seleziona lavoro' containerStyle={styles.pickerStyle} />
+					<MyPicker containerStyle = {styles.pickerStyle} pickerItemStyle={styles.pickerItemStyle} textStyle={styles.pickerText} values = {jobList} 
+						onValueChange = {(val)=>setSelectedJob(val)} selectValue = {jobList[0]} />
 				</View>
 				<View style = {styles.timerContainer}>
-					<View style = {styles.timer}>
-						<Text>TIMER</Text>
-					</View>
+					<Timer action={timerState}/>
 				</View>
-				<TimerButtons />
+				<TimerButtons state={timerState}
+					 play={()=>setTimerState('play')} stop={()=>setTimerState('stop')} pause={()=>setTimerState('pause')}/>
 			</View>
 		</SafeAreaView>
 		)
 }
+const mapStateToProps = state => ({
+	jobs: state.job
+})
+export default connect(mapStateToProps)(TimerScreen)
 
 const styles = StyleSheet.create({
 	safeArea:{
@@ -50,25 +60,17 @@ const styles = StyleSheet.create({
 		borderRadius:10,
 		backgroundColor:'#009ddc'
 	},
+	pickerText:{
+		color:'white',
+	},
+	pickerItemStyle:{
+		borderTopWidth:0,
+		backgroundColor:'#009ddcaa',
+		borderWidth:2,
+		borderColor:'#6761a8',
+	},
 	timerContainer:{
 		flex:3,
-	},
-	timer:{
-		flex:2,
-		justifyContent:'center',
-		borderWidth:1,
-	},
-	btnContainer:{
-		flex:1,
-	},
-	btnRow:{
-		flex:1,
-		alignItems:'center',
-		flexDirection:'row',
-	},
-	btn:{
-		marginRight:10,
-		marginLeft:10,
 	},
 })
 

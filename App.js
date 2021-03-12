@@ -14,7 +14,7 @@ import ResumeScreen from './screen/ResumeScreen.js'
 const Tab = createBottomTabNavigator()
 
 export default function App(){
- // persistor.purge()
+  //persistor.purge()
   return (
       <SafeAreaView style = {styles.safeArea}>
         <Provider store={store}>

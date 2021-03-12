@@ -1,16 +1,18 @@
 import React,{useState} from 'react'
-import {SafeAreaView,View,Text,StyleSheet,TextInput,Alert} from 'react-native'
+import {SafeAreaView,View,StyleSheet,TextInput,Alert,ScrollView} from 'react-native'
 import {connect} from 'react-redux'
-import {addJobAction} from '../redux/action.js'
+import {addJobAction,deleteJobAction} from '../redux/action.js'
 import MyButton from '../components/MyButton.js'
+import MyText from '../components/MyText.js'
+import JobRow from '../components/JobRow.js'
 
-function JobsScreen({addJobAction}){
+function JobsScreen({job,addJobAction,deleteJobAction}){
 	const [jobName,setJobName] = useState()
 	const [hourlyPaid,setHourlyPaid] = useState()
 	const [pressable,setPressable] = useState(true)
 
 	const pressedStyle = pressed =>[{
-		borderColor:pressed ? '#f26430' : 'white'
+		backgroundColor:pressed ? '#f26430' : 'transparent'
 	},styles.btn]
 
 	const addJob = () =>{
@@ -31,23 +33,36 @@ function JobsScreen({addJobAction}){
 			setPressable(true)
 		}
 	}
+	const deleteJob = job =>{
+		deleteJobAction(job)
+	}
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<View style={styles.mainView}>
 				<View style={styles.jobForm}>
-					<TextInput style={styles.input} placeholder='Job name' onChangeText={(t)=>setJobName(t)} value={jobName} />
-					<TextInput style={styles.input} placeholder='Hourly paid' onChangeText={(t)=>setHourlyPaid(t)} value={hourlyPaid}
+					<TextInput style={styles.input} placeholder='Job name' placeholderTextColor='white'
+						 onChangeText={(t)=>setJobName(t)} value={jobName} />
+					<TextInput style={styles.input} placeholder='Hourly paid' placeholderTextColor='white'
+						 onChangeText={(t)=>setHourlyPaid(t)} value={hourlyPaid}
 						keyboardType='number-pad' />
 					<MyButton style={({pressed})=>pressedStyle(pressed)} press={addJob} disabled={!pressable}>
-						<Text style={styles.btnText}>AGGIUNGI</Text>
+						<MyText style={styles.btnText}>ADD JOB</MyText>
 					</MyButton>
+				</View>
+				<View style={styles.listContainer}>
+					<ScrollView style={styles.list}>
+						{job.map((el,i)=> { return( <JobRow key={i} jobName={el.name} jobDel = {(j)=>deleteJob(j)} /> )} )}
+					</ScrollView>
 				</View>
 			</View>
 		</SafeAreaView>
 		)
 }
-export default connect(null,{addJobAction})(JobsScreen)
+const mapStateToProps = state => ({
+	job:state.job
+})
+export default connect(mapStateToProps,{addJobAction,deleteJobAction})(JobsScreen)
 
 const styles = StyleSheet.create({
 	safeArea:{
@@ -57,19 +72,25 @@ const styles = StyleSheet.create({
 	mainView:{
 		flex:1,
 		marginTop:'5%',
-		justifyContent:'center',
+		justifyContent:'flex-start',
 		alignItems:'center',
 	},
 	jobForm:{
-		backgroundColor:'#009b72',
+		minHeight:'25%',
 		width:'80%',
 		justifyContent:'center',
 		alignItems:'center',
-		elevation:3,
-		borderWidth:1,
+		borderWidth:3,
 		borderColor:'#6761a8',
+		borderRadius:5,
+	},
+	listContainer:{
+		maxHeight:'65%',
+		width:'80%',
+		margin:'2.5%',
 	},
 	input:{
+		color:'white',
 		width:'90%',
 		textAlign:'center',
 		margin:20,
@@ -80,12 +101,14 @@ const styles = StyleSheet.create({
 	btn:{
 		paddingRight:5,
 		paddingLeft:5,
-		borderRightWidth:2,
-		borderLeftWidth:2,
 	},
 	btnText:{
 		textAlign:'center',
-		color:'white',
-		fontSize:20,
+	},
+	list:{
+		borderWidth:3,
+		borderColor:'#6761a8',
+		borderRadius:5,
+
 	}
 })
