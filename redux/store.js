@@ -5,7 +5,7 @@ import {composeWithDevTools,devToolsEnhancer} from 'redux-devtools-extension'
 import {jobReducer} from './reducers.js'
 
 const reducers = combineReducers({
-	job:jobReducer
+	jobs:jobReducer,
 })
 const rootReducer = (state={},action)=>{
 	if(action.type === 'CLEAN_STORE'){

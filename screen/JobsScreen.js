@@ -6,7 +6,7 @@ import MyButton from '../components/MyButton.js'
 import MyText from '../components/MyText.js'
 import JobRow from '../components/JobRow.js'
 
-function JobsScreen({job,addJobAction,deleteJobAction}){
+function JobsScreen({jobs,addJobAction,deleteJobAction}){
 	const [jobName,setJobName] = useState()
 	const [hourlyPaid,setHourlyPaid] = useState()
 	const [pressable,setPressable] = useState(true)
@@ -26,7 +26,7 @@ function JobsScreen({job,addJobAction,deleteJobAction}){
 			)
 		}
 		else{
-			const newJob = {name:jobName,totH:0,paid:hourlyPaid,entry:[{date:'',hours:0}]}
+			const newJob = {[jobName]:{paid:hourlyPaid,entry:{}}}
 			addJobAction(newJob)
 			setJobName()
 			setHourlyPaid()
@@ -52,7 +52,7 @@ function JobsScreen({job,addJobAction,deleteJobAction}){
 				</View>
 				<View style={styles.listContainer}>
 					<ScrollView style={styles.list}>
-						{job.map((el,i)=> { return( <JobRow key={i} jobName={el.name} jobDel = {(j)=>deleteJob(j)} /> )} )}
+						{Object.keys(jobs).map((job,i)=> { return( <JobRow key={i} jobName={job} jobDel = {(j)=>deleteJob(j)} /> )} ) }
 					</ScrollView>
 				</View>
 			</View>
@@ -60,7 +60,7 @@ function JobsScreen({job,addJobAction,deleteJobAction}){
 		)
 }
 const mapStateToProps = state => ({
-	job:state.job
+	jobs:state.jobs
 })
 export default connect(mapStateToProps,{addJobAction,deleteJobAction})(JobsScreen)
 

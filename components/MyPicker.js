@@ -20,15 +20,26 @@ export default function MyPicker(props){
 	useEffect(()=>{
 		onValueChange(selectedItem)
 	},[selectedItem])
-
-	const MyPickerItems = values.map((el,i)=>{
-		return (
-			<TouchableOpacity style = {[{height:height},styles.pickerItem,pickerItemStyle]} key = {i} onPress = {()=>selectItem(el)}>
-				<Text style = {textStyle}>{el}</Text>						
-			</TouchableOpacity>
-		)
-	})
-
+	let MyPickerItems
+	if(values.length){
+		MyPickerItems = values.map((el,i)=>{
+			return (
+				<TouchableOpacity style = {[{height:height},styles.pickerItem,pickerItemStyle]} key = {i} onPress = {()=>selectItem(el)}>
+					<Text style = {textStyle}>{el}</Text>						
+				</TouchableOpacity>
+			)
+		}
+	)}
+	else{
+		MyPickerItems = <TouchableOpacity style = {[{height:height},styles.pickerItem,pickerItemStyle]} key = '0' onPress = {()=>emptyList()}>
+							<Text style = {textStyle}>Add new job</Text>						
+						</TouchableOpacity>
+	}
+	
+	const emptyList = () =>{
+		setDropMenu(false)
+		props.goTo()
+	}
 	const selectItem=el=>{
 		setSelectedItem(el)
 		setDropMenu(false)
@@ -50,7 +61,9 @@ export default function MyPicker(props){
 			<TouchableOpacity onPress = {toggleDropMenu} style = {[styles.pickerBar,containerStyle,dropMenu ? styles.dropMenuOpen : '']} 
 							ref = {pickerBar} onLayout = {event=>measureEl(event)} activeOpacity={0.8}>
 				<View style = {styles.inputContainer} >
-					<View style={styles.textContainer}><Text style = {textStyle}>{selectedItem}</Text></View>
+					<View style={styles.textContainer}>
+						<Text style = {textStyle}>{values.length ? selectedItem : 'No job saved'}</Text>
+					</View>
 					{icon && <View style={styles.icoContainer}><Icon name = {dropMenu ? 'caret-up' : 'caret-down'} style = {[styles.icon,iconStyle]}/></View>}
 				</View>
 				
