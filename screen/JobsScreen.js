@@ -26,7 +26,7 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 			)
 		}
 		else{
-			const newJob = {[jobName]:{paid:hourlyPaid,entry:{}}}
+			const newJob = {[jobName]:{paid:hourlyPaid,entry:[]}}
 			addJobAction(newJob)
 			setJobName()
 			setHourlyPaid()

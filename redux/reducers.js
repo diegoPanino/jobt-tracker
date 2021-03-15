@@ -14,15 +14,12 @@ export const jobReducer = (state={},action) =>{
 			const {payload} = action
 			const {job,...jobEntry} = payload
 			const newState = {...state}
+			console.log('reducers',jobEntry.startTime)
 			const date = jobEntry.startTime.split(',')
-			//newState[job].entry.findIndex((el,i) = >{})
-			//newState[job].entry = [...newState[job].entry,jobEntry]
-			newState[job].entry = {...newState[job].entry,[date[0]]:jobEntry}
-			console.log(newState[job].entry)
-			//return newState
+//access to the entry prop of [job name]'s property and create arr of obj with [entry date] index
+			newState[job].entry = {...newState[job].entry,[date[0]]:[...newState[job].entry[date[0]] || [],jobEntry]} 
+			return newState
 		}
 		default: return state
 	}
 }
-
-// (state=[{name:'',totH:0,paid:0,entry:[{startTime:0,endTime:0,hours:0}]}],action)

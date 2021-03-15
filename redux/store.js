@@ -18,6 +18,7 @@ const persistConfig ={
 	key:'root',
 	storage:AsyncStorage,
 	timeout:null,
+	whitelist:['jobs']
 }
 
 const onEndRehydrationHandler=()=>{

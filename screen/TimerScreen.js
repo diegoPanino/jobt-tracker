@@ -19,9 +19,22 @@ function TimerScreen({jobs,addEntryAction,navigation}){
 
 	const saveTime = time =>{
 		const endTime = new Date(Date.now()).toLocaleString()
+		console.log('timerScreen',endTime)
 		const startTime = new Date(playTime).toLocaleString()
+		const _1monthAgoStart = new Date(Date.now() - 2592000000).toLocaleString()
+		const _1monthAgoEnd = new Date(Date.now() - 2591900000).toLocaleString()
+		const _1month1DayAgoStart = new Date(Date.now()- 2592000000 - 86400000 ).toLocaleString()
+		const _1month1DayAgoEnd = new Date(Date.now()- 2591900000 - 86390000 ).toLocaleString()
+		const _1dayAgoStart = new Date(Date.now() - 86400000).toLocaleString()
+		const _1dayAgoEnd = new Date(Date.now() - 86390000).toLocaleString()
 		const entry = {job:selectedJob,startTime,endTime,hours:time}
+		const monthAgo = {job:selectedJob,startTime:_1monthAgoStart,endTime:_1monthAgoEnd,hours:2592000000 - 2591900000}
+		const monthDayAgo = {job:selectedJob,startTime:_1month1DayAgoStart,endTime:_1month1DayAgoEnd,hours:(2592000000 - 2591900000) - (2591900000 - 86390000)}
+		const dayAgo = {job:selectedJob,startTime:_1dayAgoStart,endTime:_1dayAgoEnd,hours: 86400000 - 86390000}
 		addEntryAction(entry)
+		addEntryAction(monthAgo)
+		addEntryAction(monthDayAgo)
+		addEntryAction(dayAgo)
 	}
 	
 	return (
