@@ -33,7 +33,8 @@ const styles = StyleSheet.create({
 	},
 	mainView:{
 		flex:1,
-		marginTop:'5%',
+		marginTop:'2.5%',
+		marginBottom:'2.5%',
 		justifyContent:'center',
 		alignItems:'center',
 	},
@@ -60,6 +61,7 @@ const styles = StyleSheet.create({
 		borderColor:'#6761a8',
 	},
 	scheduleView:{
-		flex:5
+		flex:5,
+		width:'90%',
 	},
 })

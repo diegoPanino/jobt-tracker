@@ -13,6 +13,24 @@ export default function JobSchedule(props){
 			setJobLoaded(true)
 	},[selectedJob])
 
+	const DATA = [
+  {
+    title: "Main dishes",
+    data: ["Pizza", "Burger", "Risotto"]
+  },
+  {
+    title: "Sides",
+    data: ["French Fries", "Onion Rings", "Fried Shrimps"]
+  },
+  {
+    title: "Drinks",
+    data: ["Water", "Coke", "Beer"]
+  },
+  {
+    title: "Desserts",
+    data: ["Cheese Cake", "Ice Cream"]
+  }
+];
 	const transformDateHeader = date =>{
 		const splittedData = date.split('/')
 		switch(splittedData[1]){
@@ -31,19 +49,19 @@ export default function JobSchedule(props){
 		}
 	}
 
-
 	if(selectedJob){
 		montlyWorkingDay = Object.entries(jobs[selectedJob].entry).reduce((acc,el) =>{
 			const month = transformDateHeader(el[0])
 			return {
 				...acc,
-				[month]:[...(acc[month] || []),el[1]]
+				[month]:[...(acc[month] || []),...el[1]]
 			}
 		},{})
 		sections = Object.entries(montlyWorkingDay).map((el,i)=>{
 			return {
 				day:el[0],
 				data:el[1],
+				key:i
 			}
 		})
 	}
@@ -51,9 +69,15 @@ export default function JobSchedule(props){
 		<View style={styles.mainView}>
 			{jobLoaded && <SectionList
 				sections = {sections}
-				keyExtractor = {(item, index) => item + index}
-				renderSectionHeader = { ({section}) => <MyText myStyle={styles.header}>{section.day}</MyText>}
-				renderItem = { ({item,index}) => <JobScheduleRow item = {item} key = {index}/>}
+				renderItem = { ({item,index}) => <JobScheduleRow item = {item} key = {item.key}/>}
+				renderSectionHeader = { ({section}) =>{
+						return (
+							<View style={styles.sectionHeader}>
+								<MyText myStyle={styles.header}>{section.day}</MyText>	
+							</View>
+						)
+					}
+				} 
 			/>}
 		</View>
 		)
@@ -61,10 +85,19 @@ export default function JobSchedule(props){
 const styles = StyleSheet.create({
 	mainView:{
 		flex:1,
-		justifyContent:'center',
-		backgroundColor:'blue'
+		width:'100%',
+		borderWidth:3,
+		borderColor:'#6761a8',
+		borderRadius:5,
+		padding:'2.5%',
+	},
+	sectionHeader:{
+		flex:1,
+		alignSelf:'center'
 	},
 	header:{
-
+		color:'red',
+		flex:1,
+		textAlign:'center'
 	}
 })
