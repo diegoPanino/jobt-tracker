@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState,useRef} from 'react'
 import {SafeAreaView,View,StyleSheet,TextInput,Alert,ScrollView} from 'react-native'
 import {connect} from 'react-redux'
 import {addJobAction,deleteJobAction} from '../redux/action.js'
@@ -10,12 +10,14 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 	const [jobName,setJobName] = useState()
 	const [hourlyPaid,setHourlyPaid] = useState()
 	const [pressable,setPressable] = useState(true)
+	const hourlyPaidRef = useRef(null)
 
 	const pressedStyle = pressed =>[{
 		backgroundColor:pressed ? '#f26430' : 'transparent'
 	},styles.btn]
 
 	const addJob = () =>{
+		hourlyPaidRef.current.blur()
 		setPressable(false)
 		if(!(jobName && hourlyPaid)){
 			Alert.alert(
@@ -42,10 +44,10 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 			<View style={styles.mainView}>
 				<View style={styles.jobForm}>
 					<TextInput style={styles.input} placeholder='Job name' placeholderTextColor='white'
-						 onChangeText={(t)=>setJobName(t)} value={jobName} />
+						 onChangeText={(t)=>setJobName(t)} value={jobName} onSubmitEditing = {()=>hourlyPaidRef.current.focus()} />
 					<TextInput style={styles.input} placeholder='Hourly paid' placeholderTextColor='white'
-						 onChangeText={(t)=>setHourlyPaid(t)} value={hourlyPaid}
-						keyboardType='number-pad' />
+						 onChangeText={(t)=>setHourlyPaid(t)} value={hourlyPaid} ref = {hourlyPaidRef} 
+						keyboardType='number-pad' onSubmitEditing = {addJob}/>
 					<MyButton style={({pressed})=>pressedStyle(pressed)} press={addJob} disabled={!pressable}>
 						<MyText style={styles.btnText}>ADD JOB</MyText>
 					</MyButton>

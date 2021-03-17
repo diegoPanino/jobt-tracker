@@ -17,16 +17,14 @@ function TimerScreen({jobs,addEntryAction,navigation}){
 		setTimerState('stop')
 	},[selectedJob])
 
-	
-
 	const saveTime = time =>{
 		const hours = fromMsToH(time)
 		const options = {weekday: 'short', year: 'numeric', month: 'long', day: 'numeric'}
 		const endTime = new Date(Date.now()).toLocaleString()
 		const startTime = new Date(playTime).toLocaleString()
 		const date = startTime.split(',')
-		const dayTemp = new Date(playTime).toLocaleDateString('en-GB',options).split(' ') 
-		const day = dayTemp[0]+' '+dayTemp[1]
+		const dayTemp = new Date(playTime).toLocaleDateString('en-GB',options).split(' ')
+		const day = (dayTemp[0]+dayTemp[1])
 		const startTemp = startTime.split(' ')
 		const startTemp2 = startTemp[1].split(':')
 		const start = startTemp2[0]+':'+startTemp2[1]
@@ -39,14 +37,18 @@ function TimerScreen({jobs,addEntryAction,navigation}){
 		const _1month1DayAgoEnd = new Date(Date.now()- 2591900000 - 86390000 ).toLocaleString()
 		const _1dayAgoStart = new Date(Date.now() - 86400000).toLocaleString()
 		const _1dayAgoEnd = new Date(Date.now() - 86390000).toLocaleString()
-		const entry = {job:selectedJob,date:date[0],day,start,end,hours}
-		const yesterday = {job:selectedJob,date:'14/3/2021',day:'Sun, 14',start:'08:00',end:'16:00',hours:fromMsToH(2.88e+7)}
-		const monthAgo = {job:selectedJob,date:'15/2/2021',day:'Mon, 15',start:'08:00',end:'16:00',hours:fromMsToH(2.88e+7)}
-		const monthDayAgo = {job:selectedJob,date:'14/2/2021',day:'Sun, 14',start:'08:00',end:'16:00',hours:fromMsToH(2.88e+7)}
-		/*addEntryAction(entry)*/
-		addEntryAction(yesterday)
-		addEntryAction(monthAgo)
+		const entry = {job:selectedJob,date:date[0],day,start,end,hours,isPaid:false}
+		const march = {job:selectedJob,date:'01/3/2021',day:'Mon,01',start:'08:00',end:'16:00',hours:fromMsToH(2.88e+7),isPaid:false}
+		const yesterday = {job:selectedJob,date:'16/3/2021',day:'Tue,14',start:'20:00',end:'22:30',hours:fromMsToH(2.88e+7),isPaid:false}
+		const monthAgo = {job:selectedJob,date:'15/2/2021',day:'Thu,15',start:'18:00',end:'02:00',hours:fromMsToH(2.88e+7),isPaid:false}
+		const monthDayAgo = {job:selectedJob,date:'14/2/2021',day:'Fri,14',start:'18:00',end:'01:00',hours:fromMsToH(2.88e+7),isPaid:false}
+		const single = {job:selectedJob,date:'17/2/2021',day:'Sat,17',start:'08:00',end:'16:00',hours:fromMsToH(2.88e+7),isPaid:false}
 		addEntryAction(monthDayAgo)
+		addEntryAction(monthAgo)
+		addEntryAction(single)
+		addEntryAction(march)
+		addEntryAction(yesterday)
+		addEntryAction(entry)
 	}
 	const fromMsToH = millisec =>{
  		const ms = parseInt((millisec % 1000) / 100)
@@ -106,7 +108,6 @@ const styles = StyleSheet.create({
 		flex:1,
 		width:'80%',
 		alignItems:'center',
-		
 	},
 	pickerStyle:{
 		padding:15,

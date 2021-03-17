@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import {SafeAreaView,View,Text,StyleSheet} from 'react-native'
 import {connect} from 'react-redux'
 import MyPicker from '../components/MyPicker.js'
@@ -7,6 +7,7 @@ import JobSchedule from '../components/JobSchedule.js'
 function ResumeScreen({jobs,navigation}){
 	const [selectedJob,setSelectedJob] = useState(null)
 	const jobList=Object.keys(jobs)
+
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<View style={styles.mainView}>
@@ -14,9 +15,11 @@ function ResumeScreen({jobs,navigation}){
 					<MyPicker containerStyle = {styles.pickerStyle} pickerItemStyle={styles.pickerItemStyle} textStyle={styles.pickerText} 
 							values = {jobList} onValueChange = {(val)=>setSelectedJob(val)} selectValue = {jobList[0]} goTo={()=>navigation.navigate('Job')} />
 				</View>
+				{(jobs && selectedJob) &&
 				<View style={styles.scheduleView}>
 					<JobSchedule selectedJob = {selectedJob} jobs = {jobs} />
-				</View>
+				</View>	
+				}
 			</View>
 		</SafeAreaView>
 		)
@@ -33,7 +36,7 @@ const styles = StyleSheet.create({
 	},
 	mainView:{
 		flex:1,
-		marginTop:'2.5%',
+		marginTop:'5%',
 		marginBottom:'2.5%',
 		justifyContent:'center',
 		alignItems:'center',
@@ -62,6 +65,6 @@ const styles = StyleSheet.create({
 	},
 	scheduleView:{
 		flex:5,
-		width:'90%',
+		width:'100%',
 	},
 })
