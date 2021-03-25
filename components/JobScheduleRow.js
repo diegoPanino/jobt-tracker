@@ -1,10 +1,15 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import {View,StyleSheet,Pressable} from 'react-native'
 import MyText from './MyText.js'
 
 export default function JobScheduleRow(props){
-	const {itemKey,item,section,selection} = props
+	const {itemKey,item,section,selection,deselect} = props
 	const [selected,setSelected] = useState(false)
+
+	useEffect(()=>{
+		if(deselect)
+			setSelected(false)
+	},[deselect])
 
 	const sumH = (a,b) =>{
 		const x = a.split(':')
@@ -26,15 +31,15 @@ export default function JobScheduleRow(props){
 		const year = temp[1]
 		let month
 		switch(temp[0]){
-			case 'Jan': {month = '1'; break}
-			case 'Feb': {month = '2'; break}
-			case 'Mar': {month = '3'; break}
-			case 'Apr': {month = '4'; break}
-			case 'May': {month = '5'; break}
-			case 'Jun': {month = '6'; break}
-			case 'Jul': {month = '7'; break}
-			case 'Aug': {month = '8'; break}
-			case 'Sep': {month = '9'; break}
+			case 'Jan': {month = '01'; break}
+			case 'Feb': {month = '02'; break}
+			case 'Mar': {month = '03'; break}
+			case 'Apr': {month = '04'; break}
+			case 'May': {month = '05'; break}
+			case 'Jun': {month = '06'; break}
+			case 'Jul': {month = '07'; break}
+			case 'Aug': {month = '08'; break}
+			case 'Sep': {month = '09'; break}
 			case 'Oct': {month = '10'; break}
 			case 'Nov': {month = '11'; break}
 			case 'Dec': {month = '12'; break}
@@ -47,7 +52,7 @@ export default function JobScheduleRow(props){
 		const totH = sumH(item[0].hours,item[1].hours)
 		const day = item[0].day.split(',')
 		return (
-			<Pressable onLongPress = {()=>selectDay(day[1])} delayLongPress={250}>
+			<Pressable onPress = {()=>selectDay(day[1])} delayLongPress={250}>
 				<View style={[styles.mainView,selected ? {backgroundColor:'#009ddca5'} : {}]}>
 					<View style={styles.day}>
 						<MyText style={styles.text}>{day[0]}</MyText>
@@ -63,7 +68,7 @@ export default function JobScheduleRow(props){
 							<MyText style={styles.text}>{item[1].start + '-' + item[1].end}</MyText>
 						</View>
 					</View>
-					<View style={styles.hours}><MyText style={[styles.text, item[0].isPaid ? {backgroundColor:'#009B72'}:{}]}>{totH}h</MyText></View>
+					<View style={styles.hours}><MyText style={[styles.text, item[0].isPaid ? {backgroundColor:'#009B72'}:{backgroundColor:'#F26430'}]}>{totH}h</MyText></View>
 				</View>
 			</Pressable>
 		)
@@ -73,14 +78,14 @@ export default function JobScheduleRow(props){
 		const d = day.split(',')
 		return (
 			<Pressable onLongPress = {()=>selectDay(d[1])} delayLongPress={250}>
-				<View style={[styles.mainView,selected ? {backgroundColor:'#009ddc'} : {}]}>
+				<View style={[styles.mainView,selected ? {backgroundColor:'#009ddca5'} : {}]}>
 					<View style={styles.day}>
 						<MyText style={styles.text}>{d[0]}</MyText>
 						<MyText style={styles.text}>{d[1]}</MyText>
 					</View>
 					<View style={styles.startSingle}><MyText style={styles.text}>{start}</MyText></View>
 					<View style={styles.endSingle}><MyText style={styles.text}>{end}</MyText></View>
-					<View style={styles.hours}><MyText style={[styles.text, isPaid ? {backgroundColor:'#009B72'}:{}]}>{hours}h</MyText></View>
+					<View style={styles.hours}><MyText style={[styles.text, isPaid ? {backgroundColor:'#009B72'}:{backgroundColor:'#F26430'}]}>{hours}h</MyText></View>
 				</View>
 			</Pressable>
 		)
@@ -91,14 +96,14 @@ export default function JobScheduleRow(props){
 			const d = day.split(',')
 			return (
 				<Pressable onLongPress = {()=>selectDay(d[1])} delayLongPress={250}>
-					<View style={[styles.mainView,selected ? {backgroundColor:'#009ddc'} : {}]} key={itemKey+i}>
+					<View style={[styles.mainView,selected ? {backgroundColor:'#009ddca5'} : {}]} key={itemKey+i}>
 						<View style={styles.day}>
 							{(i===0) && <MyText style={styles.text}>{d[0]}</MyText>}
 							{(i===0) && <MyText style={styles.text}>{d[1]}</MyText>}
 						</View>
 						<View style={styles.startSingle}><MyText style={styles.text}>{start}</MyText></View>
 						<View style={styles.endSingle}><MyText style={styles.text}>{end}</MyText></View>
-						<View style={styles.hours}><MyText style={[styles.text, isPaid ? {backgroundColor:'#009B72'}:{}]}>{hours}h</MyText></View>
+						<View style={styles.hours}><MyText style={[styles.text, isPaid ? {backgroundColor:'#009B72'}:{backgroundColor:'#F26430'}]}>{hours}h</MyText></View>
 					</View>
 				</Pressable>
 				)
@@ -114,6 +119,7 @@ const styles = StyleSheet.create({
 		alignItems:'center',
 		paddingRight:5,
 		paddingLeft:5,
+		zIndex:1,
 	},
 	day:{
 		flex:0.8,
@@ -129,7 +135,6 @@ const styles = StyleSheet.create({
 	hours:{
 		flex:1,
 		alignItems:'center',
-		backgroundColor:'#F26430'
 	},
 	start:{
 		flex:2,
@@ -151,20 +156,3 @@ const styles = StyleSheet.create({
 		fontSize:16,
 	}
 })
-
-
-
-/*	return (
-		<View style={styles.mainView}>
-			<View style={styles.day}><MyText style={styles.text}>{day}</MyText></View>
-			<View style={styles.morning}>
-				<View style={styles.start}><MyText style={styles.text}>{start}</MyText></View>
-				<View style={styles.end}><MyText style={styles.text}>{end}</MyText></View>
-			</View>
-			<View style={styles.evening}>
-				<View style={styles.start}><MyText style={styles.text}>{start}</MyText></View>
-				<View style={styles.end}><MyText style={styles.text}>{end}</MyText></View>
-			</View>
-			<View style={styles.hours}><MyText style={styles.text}>{(hours)}</MyText></View>
-		</View>
-		)*/

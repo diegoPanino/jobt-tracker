@@ -1,54 +1,67 @@
 import React,{useState,useEffect} from 'react'
 import {SafeAreaView,View,StyleSheet} from 'react-native'
 import {connect} from 'react-redux'
-import {addEntryAction} from '../redux/action.js'
+import {addEntryAction,isRunningAction,isNotRunningAction} from '../redux/action.js'
 import Timer from '../components/Timer.js'
 import TimerButtons from '../components/TimerButtons.js'
 import MyPicker from '../components/MyPicker.js'
 import MyText from '../components/MyText.js'
 
-function TimerScreen({jobs,addEntryAction,navigation}){
+function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunningAction,navigation}){
 	const [timerState,setTimerState] = useState('stop')
 	const [selectedJob,setSelectedJob] = useState(null)
 	const [playTime,setPlayTime] = useState(0)
 	const jobList=Object.keys(jobs)
 	
+/*	useEffect(()=>{
+		console.log('effect')
+		if(background.isRunning){
+			console.log('isRunning')  				//effect to work in background
+			setTimerState('play')
+			setPlayTime(background.startTime)
+		}
+		return ()=>console.log('closeApp')
+	},[])*/
+
 	useEffect(()=>{
 		setTimerState('stop')
 	},[selectedJob])
 
 	const saveTime = time =>{
 		const hours = fromMsToH(time)
-		const options = {weekday: 'short', year: 'numeric', month: 'long', day: 'numeric'}
-		const endTime = new Date(Date.now()).toLocaleString()
-		const startTime = new Date(playTime).toLocaleString()
-		const date = startTime.split(',')
-		const dayTemp = new Date(playTime).toLocaleDateString('en-GB',options).split(' ')
-		const day = (dayTemp[0]+dayTemp[1])
-		const startTemp = startTime.split(' ')
-		const startTemp2 = startTemp[1].split(':')
-		const start = startTemp2[0]+':'+startTemp2[1]
-		const endTemp = endTime.split(' ')
-		const endTemp2 = endTemp[1].split(':')
-		const end = endTemp2[0]+':'+endTemp2[1]
-		const _1monthAgoStart = new Date(Date.now() - 2592000000).toLocaleString()
-		const _1monthAgoEnd = new Date(Date.now() - 2591900000).toLocaleString()
-		const _1month1DayAgoStart = new Date(Date.now()- 2592000000 - 86400000 ).toLocaleString()
-		const _1month1DayAgoEnd = new Date(Date.now()- 2591900000 - 86390000 ).toLocaleString()
-		const _1dayAgoStart = new Date(Date.now() - 86400000).toLocaleString()
-		const _1dayAgoEnd = new Date(Date.now() - 86390000).toLocaleString()
-		const entry = {job:selectedJob,date:date[0],day,start,end,hours,isPaid:false}
-		const march = {job:selectedJob,date:'01/3/2021',day:'Mon,01',start:'08:00',end:'16:00',hours:fromMsToH(2.88e+7),isPaid:false}
-		const yesterday = {job:selectedJob,date:'16/3/2021',day:'Tue,14',start:'20:00',end:'22:30',hours:fromMsToH(2.88e+7),isPaid:false}
-		const monthAgo = {job:selectedJob,date:'15/2/2021',day:'Thu,15',start:'18:00',end:'02:00',hours:fromMsToH(2.88e+7),isPaid:false}
-		const monthDayAgo = {job:selectedJob,date:'14/2/2021',day:'Fri,14',start:'18:00',end:'01:00',hours:fromMsToH(2.88e+7),isPaid:false}
-		const single = {job:selectedJob,date:'17/2/2021',day:'Sat,17',start:'08:00',end:'16:00',hours:fromMsToH(2.88e+7),isPaid:false}
-		addEntryAction(monthDayAgo)
-		addEntryAction(monthAgo)
-		addEntryAction(single)
-		addEntryAction(march)
-		addEntryAction(yesterday)
+		const endTime = new Date(Date.now()).toString().split(' ') //new date with form WWW_MMM_DD_YYYY_HH:MM:SS_GMT etc etc
+		const newDate = new Date(playTime)
+		const startTime = newDate.toString().split(' ')
+		const MMtemp = newDate.getMonth() + 1
+		const mm = MMtemp < 10 ? '0' + MMtemp : MMtemp.toString() 
+		const day = startTime[0]+','+startTime[2]
+		const date = startTime[2] + '/'+ mm + '/' + startTime[3]
+		const start = startTime[4].slice(0,-3)
+		const end = endTime[4].slice(0,-3)
+		const entry0 = {job:selectedJob,date:'01/01/2021',day:'Mon,01',start:'08:00',end:'18:00',hours:'02:00',isPaid:false}
+		const entry1 = {job:selectedJob,date:'02/02/2021',day:'Tue,02',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
+		const entry2 = {job:selectedJob,date:'03/02/2021',day:'Wed,03',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
+		const entry3 = {job:selectedJob,date:'15/02/2021',day:'Thu,15',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
+		const entry4 = {job:selectedJob,date:'27/02/2021',day:'Fri,27',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
+		const entry5 = {job:selectedJob,date:'01/03/2021',day:'Sat,01',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
+		const entry6 = {job:selectedJob,date:'02/03/2021',day:'Sun,02',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
+		const entry7 = {job:selectedJob,date:'05/03/2021',day:'Mon,05',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
+		const entry8 = {job:selectedJob,date:'01/10/2021',day:'Tue,01',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
+		const entry = {job:selectedJob,date,day,start,end,hours,isPaid:false}
+		addEntryAction(entry0)
+		addEntryAction(entry1)
+		addEntryAction(entry2)
+		addEntryAction(entry3)
+		addEntryAction(entry4)
+		addEntryAction(entry5)
+		addEntryAction(entry6)
+		addEntryAction(entry7)
 		addEntryAction(entry)
+		addEntryAction(entry8)
+	}
+	const setStartTime = time => {
+		setPlayTime(time)
+		isRunningAction(time)
 	}
 	const fromMsToH = millisec =>{
  		const ms = parseInt((millisec % 1000) / 100)
@@ -78,7 +91,7 @@ function TimerScreen({jobs,addEntryAction,navigation}){
 							values = {jobList} onValueChange = {(val)=>setSelectedJob(val)} selectValue = {jobList[0]} goTo={()=>navigation.navigate('Job')} />
 				</View>
 				<View style = {styles.timerContainer}>
-					<Timer action={timerState} save = {time=>saveTime(time)} entryTimeCreation = {(time)=>setPlayTime(time)} />
+					<Timer action={timerState} save = {time=>saveTime(time)} entryTimeCreation = {setStartTime} />
 				</View>
 				{ jobList.length ? <TimerButtons state={timerState} play={()=>setTimerState('play')}
 							  stop={()=>setTimerState('stop')} pause={()=>setTimerState('pause')}/>
@@ -89,9 +102,10 @@ function TimerScreen({jobs,addEntryAction,navigation}){
 		)
 }
 const mapStateToProps = state => ({
-	jobs: state.jobs
+	jobs: state.jobs,
+	background: state.background
 })
-export default connect(mapStateToProps,{addEntryAction})(TimerScreen)
+export default connect(mapStateToProps,{addEntryAction,isRunningAction,isNotRunningAction})(TimerScreen)
 
 const styles = StyleSheet.create({
 	safeArea:{

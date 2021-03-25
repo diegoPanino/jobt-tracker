@@ -9,6 +9,7 @@ export default function JobSchedule(props){
 	const [jobLoaded,setJobLoaded] = useState(false)
 	const [itemSelection,setItemSelection] = useState([])
 	const [showModal,setShowModal] = useState(false)
+	const [deselectAll,setDeselectAll] = useState(false)
 	const fadeIn = useRef(new Animated.Value(0)).current
 	let sections,montlyWorkingDay
 
@@ -17,16 +18,18 @@ export default function JobSchedule(props){
 			setShowModal(true)
 			Animated.timing(fadeIn,{
 				toValue:1,
-				timing:300,
+				duration:150,
 				useNativeDriver:true
-			}).start()				
+			}).start()	
+			setDeselectAll(false)			
 		}
 		else{
 			Animated.timing(fadeIn,{
 				toValue:0,
-				timing:300,
+				duration:150,
 				useNativeDriver:true
-			}).start(finishe=>setShowModal(false))
+			}).start(finished=>setShowModal(false))
+			setDeselectAll(true)
 		}
 	},[itemSelection])
 
@@ -40,6 +43,11 @@ export default function JobSchedule(props){
 
 		setItemSelection(isc)
 	}
+	const toggleSelection = day =>{
+		setItemSelection([])
+		setDeselectAll(true)
+	}
+
 	const getMoneyfromH = hh => {
 		const {paid} = jobs[selectedJob]
 		const temp = hh.split(':')
@@ -59,15 +67,15 @@ export default function JobSchedule(props){
 	const transformDateHeader = date =>{
 		const splittedData = date.split('/')
 		switch(splittedData[1]){
-			case '1': return 'Jan ' + splittedData[2]
-			case '2': return 'Feb ' + splittedData[2]
-			case '3': return 'Mar ' + splittedData[2]
-			case '4': return 'Apr ' + splittedData[2]
-			case '5': return 'May ' + splittedData[2]
-			case '6': return 'Jun ' + splittedData[2]
-			case '7': return 'Jul ' + splittedData[2]
-			case '8': return 'Aug ' + splittedData[2]
-			case '9': return 'Sep ' + splittedData[2]
+			case '01': return 'Jan ' + splittedData[2]
+			case '02': return 'Feb ' + splittedData[2]
+			case '03': return 'Mar ' + splittedData[2]
+			case '04': return 'Apr ' + splittedData[2]
+			case '05': return 'May ' + splittedData[2]
+			case '06': return 'Jun ' + splittedData[2]
+			case '07': return 'Jul ' + splittedData[2]
+			case '08': return 'Aug ' + splittedData[2]
+			case '09': return 'Sep ' + splittedData[2]
 			case '10': return 'Oct ' + splittedData[2]
 			case '11': return 'Nov ' + splittedData[2]
 			case '12': return 'Dec ' + splittedData[2]
@@ -111,7 +119,9 @@ export default function JobSchedule(props){
 				sections = {sections}
 				keyExtractor={(item, index) => item + index}
 				ListEmptyComponent = { () => <View style={styles.emptyList}><MyText>You didn't work, pal</MyText></View>}
-				renderItem = { ({item,index,section}) => <JobScheduleRow item = {item} selection = {(day)=>selectItem(day)} section={section} keyIndex={index} key = {item.key}/>}
+				renderItem = { ({item,index,section}) => 
+					<JobScheduleRow item = {item} selection = {(day)=>selectItem(day)} 
+							section={section} keyIndex={index} key = {item.key} deselect = {deselectAll}/>}
 				renderSectionHeader = { ({section}) =>{
 						return (
 							<View style={styles.sectionHeader}>
@@ -125,7 +135,8 @@ export default function JobSchedule(props){
 			/>}
 			{showModal && 
 				<Animated.View style={[styles.modal,{opacity:fadeIn}]}>
-					<ModalManageEntries selection = {itemSelection}/>
+					<ModalManageEntries selection = {itemSelection} job={selectedJob} 
+								toggleSelection = {toggleSelection} />
 				</Animated.View>
 			}
 		</View>
@@ -137,13 +148,15 @@ const styles = StyleSheet.create({
 		padding:'1%',
 	},
 	sectionList:{
+
 	},
 	modal:{
-		flex:1,
+		height:'25%',
 		justifyContent:'center',
 		alignItems:'center',
 		borderRadius:5,
 		backgroundColor:'#6761a8'
+		
 	},
 	emptyList:{
 		flex:1,
