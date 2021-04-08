@@ -4,7 +4,9 @@ import {ADD_JOB,addJobAction,
 		TOGGLE_IS_PAID,toggleIsPaidAction,
 		DELETE_DATES,deleteDatesAction,
 		IS_RUNNING,isRunningAction,
-		IS_NOT_RUNNING,isNotRunningAction
+		IS_NOT_RUNNING,isNotRunningAction,
+		IS_PAUSED,pauseAction,
+		SET_STATE,setStateAction
 } from './action.js'
 
 export const jobReducer = (state={},action) =>{
@@ -41,12 +43,13 @@ export const jobReducer = (state={},action) =>{
 		default: return state
 	}
 }
-export const backgroundReducer = (state={startTime:0,isRunning:false},action) =>{
+export const backgroundReducer = (state={totalTime:0,startTime:0,isRunning:false,paused:false,state:'stop'},action) =>{
 	switch(action.type){
-		case IS_RUNNING : return {...state,startTime:action.payload,isRunning:true}
-		case IS_NOT_RUNNING : return {...state,startTime:0,isRunning:false}
+		case IS_RUNNING : return {...state,startTime: action.payload ? action.payload : state.startTime,isRunning:true,paused:false,state:'play'}
+		case IS_NOT_RUNNING : return {totalTime:0,startTime:0,isRunning:false,paused:false,state:'stop'}
+		case SET_STATE: return {...state,state:action.payload}
+		//case PLAY : return {...state,isRunning:true,paused:false}
+		case IS_PAUSED : return {...state,totalTime:action.payload,paused:true,state:'pause'}
 		default : return state	
 	}
-	
-
 }

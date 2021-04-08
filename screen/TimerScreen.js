@@ -1,32 +1,72 @@
-import React,{useState,useEffect} from 'react'
-import {SafeAreaView,View,StyleSheet} from 'react-native'
+import React,{useState,useEffect,useRef} from 'react'
+import {SafeAreaView,View,StyleSheet, AppState} from 'react-native'
 import {connect} from 'react-redux'
-import {addEntryAction,isRunningAction,isNotRunningAction} from '../redux/action.js'
+import {addEntryAction,isRunningAction,isNotRunningAction,pauseAction,setStateAction} from '../redux/action.js'
 import Timer from '../components/Timer.js'
 import TimerButtons from '../components/TimerButtons.js'
 import MyPicker from '../components/MyPicker.js'
 import MyText from '../components/MyText.js'
 
-function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunningAction,navigation}){
+function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunningAction,pauseAction,navigation}){
 	const [timerState,setTimerState] = useState('stop')
 	const [selectedJob,setSelectedJob] = useState(null)
+	const prevJob = usePrevious(selectedJob)
 	const [playTime,setPlayTime] = useState(0)
+	const appStateRef = useRef(AppState.currentState)
+	const [appState,setAppState] = useState(appStateRef.current)
 	const jobList=Object.keys(jobs)
-	
-/*	useEffect(()=>{
-		console.log('effect')
-		if(background.isRunning){
-			console.log('isRunning')  				//effect to work in background
-			setTimerState('play')
-			setPlayTime(background.startTime)
-		}
-		return ()=>console.log('closeApp')
-	},[])*/
 
 	useEffect(()=>{
-		setTimerState('stop')
-	},[selectedJob])
+		return ()=>{
+			setStateAction(timerState)
+		}
+	},[])
 
+//event run on the first render and on unmount adding, and removing listener for app state
+	useEffect(()=>{
+		AppState.addEventListener('change',appStateHandler)
+		return ()=> {
+			AppState.removeEventListener('change',appStateHandler)
+		}
+	},[])
+	const appStateHandler = nextAppState =>{
+		if(appStateRef.current === 'active' && nextAppState.match(/inactive|background/))
+			setTimerState('background')
+		if(appStateRef.current.match(/inactive|background/) && nextAppState === 'active'){
+			setTimerState('restore')
+			setPlayTime(background.startTime)
+		}
+		appStateRef.current = nextAppState;
+    	setAppState(appStateRef.current);
+	}
+
+//usePrevious store the prev val of a value using ref hooks
+	function usePrevious(value) {
+ 		const ref = useRef()
+  		useEffect(() => {
+    		ref.current = value
+  		});
+  	return ref.current
+	}
+//anytime selectedJob change, stop the timer, if it's a first render check with prevJob and selectedJob to skip a stop while timer is in restore mod
+	useEffect(()=>{
+		if(prevJob !== selectedJob && prevJob !== null){
+			setTimerState('stop')
+		}
+	},[selectedJob])
+//anytime the flag isRunning change and is true, set the timerState to restore
+	useEffect(()=>{
+		if(background.isRunning && !(timerState === 'play')){
+			setTimerState('restore')
+			setPlayTime(background.startTime)
+		}
+	},[background.isRunning])
+
+	useEffect(()=>  {
+		if(timerState === 'play')
+			isRunningAction(playTime)			
+	},[playTime])
+//saveTime is call when stop is press and create the entry obj for the store
 	const saveTime = time =>{
 		const hours = fromMsToH(time)
 		const endTime = new Date(Date.now()).toString().split(' ') //new date with form WWW_MMM_DD_YYYY_HH:MM:SS_GMT etc etc
@@ -48,7 +88,7 @@ function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunnin
 		const entry7 = {job:selectedJob,date:'05/03/2021',day:'Mon,05',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
 		const entry8 = {job:selectedJob,date:'01/10/2021',day:'Tue,01',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
 		const entry = {job:selectedJob,date,day,start,end,hours,isPaid:false}
-		addEntryAction(entry0)
+	/*	addEntryAction(entry0)
 		addEntryAction(entry1)
 		addEntryAction(entry2)
 		addEntryAction(entry3)
@@ -57,11 +97,10 @@ function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunnin
 		addEntryAction(entry6)
 		addEntryAction(entry7)
 		addEntryAction(entry)
-		addEntryAction(entry8)
+		addEntryAction(entry8)*/
 	}
 	const setStartTime = time => {
 		setPlayTime(time)
-		isRunningAction(time)
 	}
 	const fromMsToH = millisec =>{
  		const ms = parseInt((millisec % 1000) / 100)
@@ -82,6 +121,17 @@ function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunnin
 
 	  	return hours + ':' + minutes
 	}
+
+	const onStop = () =>{
+		setTimerState('stop')
+		isNotRunningAction()
+	}
+	const onPause = () =>{
+		setTimerState('pause')
+	}
+	const onPlay = () =>{
+		setTimerState('play')
+	}
 	
 	return (
 		<SafeAreaView style = {styles.safeArea}>
@@ -91,10 +141,11 @@ function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunnin
 							values = {jobList} onValueChange = {(val)=>setSelectedJob(val)} selectValue = {jobList[0]} goTo={()=>navigation.navigate('Job')} />
 				</View>
 				<View style = {styles.timerContainer}>
-					<Timer action={timerState} save = {time=>saveTime(time)} entryTimeCreation = {setStartTime} />
+					<Timer action={timerState} save = {time=>saveTime(time)} entryTimeCreation = {setStartTime}
+							 restore = {background} playAction = {isRunningAction} pauseAction = {pauseAction}/>
 				</View>
-				{ jobList.length ? <TimerButtons state={timerState} play={()=>setTimerState('play')}
-							  stop={()=>setTimerState('stop')} pause={()=>setTimerState('pause')}/>
+				{ jobList.length ? <TimerButtons state={timerState} background = {background} play={onPlay}
+							  stop={onStop} pause={onPause}/>
 							  : null
 				}
 			</View>
@@ -103,9 +154,9 @@ function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunnin
 }
 const mapStateToProps = state => ({
 	jobs: state.jobs,
-	background: state.background
+	background: state.background,
 })
-export default connect(mapStateToProps,{addEntryAction,isRunningAction,isNotRunningAction})(TimerScreen)
+export default connect(mapStateToProps,{addEntryAction,isRunningAction,isNotRunningAction,pauseAction,setStateAction})(TimerScreen)
 
 const styles = StyleSheet.create({
 	safeArea:{
@@ -143,11 +194,3 @@ const styles = StyleSheet.create({
 		flex:3,
 	},
 })
-
-
-/*
-<Pressable style = {({pressed})=>pressedStyle(pressed)} onPress = {pause} >
-						{((timerState !== 'pause') && (timerState === 'play')) && 
-							<Icon name = 'pause' size = {100} />}
-					</Pressable>
-*/

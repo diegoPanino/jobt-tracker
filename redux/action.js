@@ -5,6 +5,8 @@ export const TOGGLE_IS_PAID = 'TOGGLE_IS_PAID'
 export const DELETE_DATES = 'DELETE_DATES'
 export const IS_RUNNING = 'IS_RUNNING'
 export const IS_NOT_RUNNING = 'IS_NOT_RUNNING'
+export const IS_PAUSED = 'IS_PAUSED'
+export const SET_STATE = 'SET_STATE'
 
 export const addJobAction = job => ({
 	type:ADD_JOB,
@@ -32,4 +34,12 @@ export const isRunningAction = time =>({
 })
 export const isNotRunningAction = time => ({
 	type:IS_NOT_RUNNING
+})
+export const pauseAction = time =>({
+	type:IS_PAUSED,
+	payload: time
+})
+export const setStateAction = state => ({
+	type:SET_STATE,
+	payload:state
 })

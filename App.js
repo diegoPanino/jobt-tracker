@@ -30,9 +30,7 @@ export default function App(){
                   iconName = focused ? 'briefcase-sharp' : 'briefcase-outline'
                 } else if(route.name === 'Resume'){
                   iconName = focused ? 'calendar' : 'calendar-outline'
-                } else if(route.name === 'Test'){
-                  iconName = focused ? 'bug' : 'bug-outline'
-                }
+                } 
                 return <Icon name = {iconName} size = {size} color = {color} />
               },
             })}
@@ -46,7 +44,6 @@ export default function App(){
                 <Tab.Screen name = 'Timer' component = {TimerScreen} />
                 <Tab.Screen name = 'Job' component = {JobsScreen} />
                 <Tab.Screen name = 'Resume' component = {ResumeScreen} />
-                <Tab.Screen name = 'Test' component = {Test} />
               </Tab.Navigator>
             </NavigationContainer>
           </PersistGate>

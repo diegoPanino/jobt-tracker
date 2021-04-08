@@ -3,7 +3,7 @@ import {View,StyleSheet,Pressable} from 'react-native'
 import MyText from './MyText.js'
 
 export default function JobScheduleRow(props){
-	const {itemKey,item,section,selection,deselect} = props
+	const {keyIndex,item,section,selection,deselect} = props
 	const [selected,setSelected] = useState(false)
 
 	useEffect(()=>{
@@ -85,7 +85,7 @@ export default function JobScheduleRow(props){
 					</View>
 					<View style={styles.startSingle}><MyText style={styles.text}>{start}</MyText></View>
 					<View style={styles.endSingle}><MyText style={styles.text}>{end}</MyText></View>
-					<View style={styles.hours}><MyText style={[styles.text, isPaid ? {backgroundColor:'#009B72'}:{backgroundColor:'#F26430'}]}>{hours}h</MyText></View>
+					<View style={styles.hours}><MyText style={[styles.hours,styles.text, isPaid ? {backgroundColor:'#009B72'}:{backgroundColor:'#F26430'}]}>{hours}h</MyText></View>
 				</View>
 			</Pressable>
 		)
@@ -95,8 +95,8 @@ export default function JobScheduleRow(props){
 			const {hours,day,start,end,isPaid} = entry
 			const d = day.split(',')
 			return (
-				<Pressable onLongPress = {()=>selectDay(d[1])} delayLongPress={250}>
-					<View style={[styles.mainView,selected ? {backgroundColor:'#009ddca5'} : {}]} key={itemKey+i}>
+				<Pressable onLongPress = {()=>selectDay(d[1])} delayLongPress={250} key={keyIndex+i}>
+					<View style={[styles.mainView,selected ? {backgroundColor:'#009ddca5'} : {}]} >
 						<View style={styles.day}>
 							{(i===0) && <MyText style={styles.text}>{d[0]}</MyText>}
 							{(i===0) && <MyText style={styles.text}>{d[1]}</MyText>}
@@ -154,5 +154,9 @@ const styles = StyleSheet.create({
 	},
 	text:{
 		fontSize:16,
+	},
+	hours:{
+		paddingLeft:2,
+		paddingRight:2,
 	}
 })

@@ -9,7 +9,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width
 const SCREEN_HEIGTH = Dimensions.get('window').height
 
 function  ModalManageEntries(props){
-	const {job,selection,toggleSelection,toggleIsPaidAction,deleteDatesAction} = props
+	const {job,selection,toggleSelection,toggleIsPaidAction,deleteDatesAction,resumePage} = props
 	const [deleteConfirm,setDeleteConfirm] = useState(false)
 	const fade = useRef(new Animated.Value(1)).current
 
@@ -35,6 +35,9 @@ function  ModalManageEntries(props){
 		deleteDatesAction({dates:selection,job:job})
 		toggleSelection()
 	}
+	const toggleResume = () =>{
+		resumePage()
+	}
 
 	return (
 		<View style = {styles.mainView}>
@@ -54,8 +57,10 @@ function  ModalManageEntries(props){
 							</Pressable>
 						</View>
 						<View style = {[styles.icoContainer,styles.centerContainer]}>
-							<Icon name = 'clipboard-outline' size = {50} color = '#009ddc' />
-							<MyText style = {styles.textCounter}>resume</MyText>
+							<Pressable onPress = {toggleResume} >
+								<Icon name = 'clipboard-outline' size = {50} color = '#009ddc' />
+								<MyText style = {styles.textCounter}>resume</MyText>
+							</Pressable>
 						</View>
 						<View style = {styles.icoContainer}>
 							<Pressable onPress = {toggleMenu}>

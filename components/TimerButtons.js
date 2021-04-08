@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/dist/Ionicons'
 import MyButton from './MyButton.js'
 
 export default function TimerButtons(props){
-	const {state,play,stop,pause} = props
+	const {state,play,stop,pause,background} = props
 	const onStop = () =>{
 		stop()
 	}
@@ -19,15 +19,14 @@ export default function TimerButtons(props){
 		borderWidth:2,
 		borderColor:pressed ? '#f26430' : 'transparent'
 	},styles.btn]
-
 	return (
 		<View style = {styles.btnRow}>
 			<MyButton style={({pressed})=>pressedStyle(pressed)} press = {onPause} >
-				{((state !== 'pause') && (state === 'play')) && 
+				{((state !== 'pause') && (state !== 'stop') && !(background.paused)) && 
 					<Icon name = 'pause' size = {100} color='#009ddc' />}
 			</MyButton>
 			<MyButton style = {({pressed})=>pressedStyle(pressed)} press = {onPlay}>
-				{!(state === 'play') &&
+				{((state === 'pause') || (state === 'stop') || background.paused ) &&
 					<Icon name = 'play' size = {100} color='#009ddc' />}
 			</MyButton>
 			<MyButton style = {({pressed})=>pressedStyle(pressed)} press = {onStop}>

@@ -3,12 +3,15 @@ import {View, StyleSheet, SectionList,Modal,Animated} from 'react-native'
 import MyText from './MyText.js'
 import JobScheduleRow from './JobScheduleRow.js'
 import ModalManageEntries from './ModalManageEntries.js'
+import ResumePage from './ResumePage.js'
 
 export default function JobSchedule(props){
 	const {jobs,selectedJob} = props
 	const [jobLoaded,setJobLoaded] = useState(false)
 	const [itemSelection,setItemSelection] = useState([])
+	const [resumeSelection,setResumeSelection] = useState([])
 	const [showModal,setShowModal] = useState(false)
+	const [showResumePage, setShowResumePage] = useState(false)
 	const [deselectAll,setDeselectAll] = useState(false)
 	const fadeIn = useRef(new Animated.Value(0)).current
 	let sections,montlyWorkingDay
@@ -32,6 +35,12 @@ export default function JobSchedule(props){
 			setDeselectAll(true)
 		}
 	},[itemSelection])
+	useEffect(()=>{
+		if(showResumePage){
+			const newResSel = Object.entries(jobs[selectedJob].entry).filter(el => itemSelection.includes(el[0]))
+			setResumeSelection(newResSel)
+		}
+	},[showResumePage])
 
 	const selectItem = day =>{
 		const length =itemSelection.length
@@ -112,8 +121,15 @@ export default function JobSchedule(props){
 			(setJobLoaded(false))
 	},[selectedJob])
 
+	const toggleResumePage = () =>{
+		setShowResumePage(prevState => !prevState)
+	}
+
 	return (
 		<View style={styles.mainView}>
+		{showResumePage && 
+				<ResumePage toggleResumePage = {toggleResumePage} selection = {resumeSelection} />
+			}
 			{jobLoaded && <SectionList
 				style = {styles.sectionList}
 				sections = {sections}
@@ -136,7 +152,7 @@ export default function JobSchedule(props){
 			{showModal && 
 				<Animated.View style={[styles.modal,{opacity:fadeIn}]}>
 					<ModalManageEntries selection = {itemSelection} job={selectedJob} 
-								toggleSelection = {toggleSelection} />
+								toggleSelection = {toggleSelection} resumePage = {toggleResumePage} />
 				</Animated.View>
 			}
 		</View>

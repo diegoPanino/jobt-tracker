@@ -10,6 +10,7 @@ function ResumeScreen({jobs,navigation}){
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
+			
 			<View style={styles.mainView}>
 				<View style = {styles.pickerContainer}>
 					<MyPicker containerStyle = {styles.pickerStyle} pickerItemStyle={styles.pickerItemStyle} textStyle={styles.pickerText} 
