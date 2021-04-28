@@ -1,20 +1,34 @@
 import React,{useState,useEffect,useRef} from 'react'
-import {View, StyleSheet, SectionList,Modal,Animated} from 'react-native'
+import {View, StyleSheet, SectionList,Modal,Animated,Pressable} from 'react-native'
 import MyText from './MyText.js'
 import JobScheduleRow from './JobScheduleRow.js'
 import ModalManageEntries from './ModalManageEntries.js'
 import ResumePage from './ResumePage.js'
+import {getMoneyfromH,transformDateHeader,sumH} from '../utility/Utility.js'
 
 export default function JobSchedule(props){
 	const {jobs,selectedJob} = props
 	const [jobLoaded,setJobLoaded] = useState(false)
 	const [itemSelection,setItemSelection] = useState([])
+	const [paidUnpaidSelection,setPaidUnpaidSelection] = useState([])
 	const [resumeSelection,setResumeSelection] = useState([])
 	const [showModal,setShowModal] = useState(false)
 	const [showResumePage, setShowResumePage] = useState(false)
 	const [deselectAll,setDeselectAll] = useState(false)
+	const [selection$,setSelection$] = useState(0)
+	const [selectionH,setSelectionH] = useState('00:00')
 	const fadeIn = useRef(new Animated.Value(0)).current
 	let sections,montlyWorkingDay
+
+	useEffect(()=>{
+		sections.map(day => {
+		day.data.sort((a,b)=>{
+			const day1 = a[0].day.split(',')
+			const day2 = b[0].day.split(',')
+			return Number(day2[1]) - Number(day1[1])
+		})
+	})
+	},[jobs])
 
 	useEffect(()=>{
 		if(itemSelection.length){
@@ -36,63 +50,69 @@ export default function JobSchedule(props){
 		}
 	},[itemSelection])
 	useEffect(()=>{
+		setItemSelection(paidUnpaidSelection)
+	},[paidUnpaidSelection])
+	useEffect(()=>{
 		if(showResumePage){
 			const newResSel = Object.entries(jobs[selectedJob].entry).filter(el => itemSelection.includes(el[0]))
+			const totalHArr = newResSel.map(entry => {
+				return entry[1].reduce((acc,el) => {
+					return sumH(acc,el.hours)
+				},'00:00')
+			})
+			const totalH = totalHArr.reduce((acc,el)=>{
+				return sumH(acc,el)
+			},'00:00')
+			const total$ = getMoneyfromH(totalH,jobs[selectedJob].paid)
 			setResumeSelection(newResSel)
+			setSelectionH(totalH)
+			setSelection$(total$)
 		}
 	},[showResumePage])
 
 	const selectItem = day =>{
-		const length =itemSelection.length
+		const length = itemSelection.length
 		let isc = itemSelection.filter(date=>{
 			return date !== day
 		})
 		if(isc.length === length)
 			isc = [...itemSelection,day]
-
+		
 		setItemSelection(isc)
 	}
 	const toggleSelection = day =>{
-		setItemSelection([])
+		setPaidUnpaidSelection([])
 		setDeselectAll(true)
 	}
 
-	const getMoneyfromH = hh => {
-		const {paid} = jobs[selectedJob]
-		const temp = hh.split(':')
-		const m = temp[1]
-		let quarter 
-		switch(m){
-			case '15' : {quarter = 1/4; break}
-			case '30' : {quarter = 1/2; break}
-			case '45' : {quarter = 3/4; break}
-			default: {quarter = 0; break}
+	const fastSelection = type =>{
+		if(itemSelection.length && paidUnpaidSelection.length){
+			toggleSelection()
 		}
-		const h = Number(temp[0])
-		const $ = (h * paid) + (quarter * paid)
-		return Number($)
-
-	}
-	const transformDateHeader = date =>{
-		const splittedData = date.split('/')
-		switch(splittedData[1]){
-			case '01': return 'Jan ' + splittedData[2]
-			case '02': return 'Feb ' + splittedData[2]
-			case '03': return 'Mar ' + splittedData[2]
-			case '04': return 'Apr ' + splittedData[2]
-			case '05': return 'May ' + splittedData[2]
-			case '06': return 'Jun ' + splittedData[2]
-			case '07': return 'Jul ' + splittedData[2]
-			case '08': return 'Aug ' + splittedData[2]
-			case '09': return 'Sep ' + splittedData[2]
-			case '10': return 'Oct ' + splittedData[2]
-			case '11': return 'Nov ' + splittedData[2]
-			case '12': return 'Dec ' + splittedData[2]
+		else{
+			const newSelection = Object.entries(jobs[selectedJob].entry).filter(entry =>{
+				return entry[1][0].isPaid === type
+			})
+			const pUSelection = newSelection.map(day=>{
+				return day[0]
+			})
+			setPaidUnpaidSelection(pUSelection)
 		}
 	}
 
 	if(selectedJob && Object.keys(jobs).length){
-		montlyWorkingDay = Object.entries(jobs[selectedJob].entry).reverse().reduce((acc,el) =>{
+		montlyWorkingDay = Object.entries(jobs[selectedJob].entry).sort((a,b)=>{
+			const date1 = a[0].split('/')
+			const date2 = b[0].split('/')
+			if(date1[2] === date2[2]){
+				if(date1[1] === date2[1]){
+					return Number(date2[0]) - Number(date1[0]) //different day
+				}//end of same month
+				else return Number(date2[1]) - Number(date1[1]) //different month
+			}//end of same year if
+			else return Number(date2[2]) - Number(date1[2]) //different year
+
+		}).reduce((acc,el) =>{
 			const month = transformDateHeader(el[0])
 			return {
 				...acc,
@@ -102,7 +122,7 @@ export default function JobSchedule(props){
 		sections = Object.entries(montlyWorkingDay).map((el,i)=>{
 			const money = el[1].map(day=>{
 				return day.reduce((acc,element,i)=>{
-					return acc + getMoneyfromH(element.hours)
+					return acc + getMoneyfromH(element.hours,jobs[selectedJob].paid)
 				},0)	
 			})
 			return {
@@ -124,34 +144,51 @@ export default function JobSchedule(props){
 	const toggleResumePage = () =>{
 		setShowResumePage(prevState => !prevState)
 	}
+	const pressedStyle = pressed =>[{
+		backgroundColor: pressed ? '#009ddc' : 'transparent'
+	},styles.closeBtn]
 
 	return (
 		<View style={styles.mainView}>
 		{showResumePage && 
-				<ResumePage toggleResumePage = {toggleResumePage} selection = {resumeSelection} />
+				<ResumePage toggleResumePage = {toggleResumePage} selection = {resumeSelection} salary = {selection$} totalH = {selectionH} />
 			}
-			{jobLoaded && <SectionList
-				style = {styles.sectionList}
-				sections = {sections}
-				keyExtractor={(item, index) => item + index}
-				ListEmptyComponent = { () => <View style={styles.emptyList}><MyText>You didn't work, pal</MyText></View>}
-				renderItem = { ({item,index,section}) => 
-					<JobScheduleRow item = {item} selection = {(day)=>selectItem(day)} 
-							section={section} keyIndex={index} key = {item.key} deselect = {deselectAll}/>}
-				renderSectionHeader = { ({section}) =>{
-						return (
-							<View style={styles.sectionHeader}>
-								<MyText style = {styles.header}>{section.day}</MyText>
-								<MyText style =	{styles.money}>{section.money}$</MyText>
-							</View>
-						)
-					}
+			{jobLoaded &&
+			<View style={styles.contentView}>
+				{!paidUnpaidSelection.length && 
+					<View style = {styles.unpaidSel}>
+						<Pressable style = {({pressed})=>pressedStyle(pressed)} onPress = {()=>fastSelection(false)}>
+							<MyText style = {styles.textCounter}>Select unpaid</MyText>
+						</Pressable>
+						<Pressable style = {({pressed})=>pressedStyle(pressed)} onPress = {()=>fastSelection(true)}>
+							<MyText style = {styles.textCounter}>Select paid</MyText>
+						</Pressable>
+					</View>
 				}
-				ItemSeparatorComponent = { () => <View style={styles.separator} />} 
-			/>}
+				<SectionList
+					style = {styles.sectionList}
+					sections = {sections}
+					keyExtractor={(item, index) => item + index}
+					ListEmptyComponent = { () => <View style={styles.emptyList}><MyText>You didn't work, pal</MyText></View>}
+					renderItem = { ({item,index,section}) => 
+						<JobScheduleRow item = {item} selection = {(day)=>selectItem(day)} paidUnpaidSelection = {paidUnpaidSelection}
+								section={section} keyIndex={index} key = {item.key} deselect = {deselectAll}/>}
+					renderSectionHeader = { ({section}) =>{
+							return (
+								<View style={styles.sectionHeader}>
+									<MyText style = {styles.header}>{section.day}</MyText>
+									<MyText style =	{styles.money}>{section.money}$</MyText>
+								</View>
+							)
+						}
+					}
+					ItemSeparatorComponent = { () => <View style={styles.separator} />} 
+				/>
+			</View>
+			}
 			{showModal && 
 				<Animated.View style={[styles.modal,{opacity:fadeIn}]}>
-					<ModalManageEntries selection = {itemSelection} job={selectedJob} 
+					<ModalManageEntries selection = {itemSelection} job={selectedJob}
 								toggleSelection = {toggleSelection} resumePage = {toggleResumePage} />
 				</Animated.View>
 			}
@@ -163,6 +200,9 @@ const styles = StyleSheet.create({
 		flex:1,
 		padding:'1%',
 	},
+	contentView:{
+		flex:1,
+	},
 	sectionList:{
 
 	},
@@ -171,7 +211,8 @@ const styles = StyleSheet.create({
 		justifyContent:'center',
 		alignItems:'center',
 		borderRadius:5,
-		backgroundColor:'#6761a8'
+		backgroundColor:'#6761a8',
+		zIndex:10,
 		
 	},
 	emptyList:{
@@ -200,5 +241,18 @@ const styles = StyleSheet.create({
 		flex:1,
 		marginRight:5,
 		textAlign:'right'
+	},
+	closeBtn:{
+		alignSelf:'center',
+		paddingRight:10,
+		paddingLeft:10,
+		borderWidth:1,
+		borderColor:'#009ddc',
+		borderRadius:40,
+	},
+	unpaidSel:{
+		flexDirection:'row',
+		justifyContent:'space-between',
+		margin:2,
 	}
 })

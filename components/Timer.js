@@ -21,6 +21,10 @@ export default function Timer(props){
 				clearInterval(intervalID)
 		}
 	},[])
+	useEffect(()=>{
+		if(restore.startTime)
+			setStartTime(restore.startTime)
+	},[restore.startTime])
 //effect responding to the timer commands
 //on 'PLAY' save the current press time and start the interval, storing the id into the state
 //on 'STOP' switch the isStopped state to true and activate the effect, is the only one that can switch to true
@@ -30,9 +34,8 @@ export default function Timer(props){
 			setIsPaused(false)
 			setIsStopped(false)
 			let elapsedTime
-			if(restore.paused){
+			if(restore.paused)
 				elapsedTime = Number(restore.totalTime)
-			}
 			else{
 				elapsedTime = Number(new Date(Date.now())) - Number(startTime) + Number(restore.totalTime)
 			}
@@ -88,7 +91,7 @@ export default function Timer(props){
 				}
 			}
 		}
-	},[props.action])
+	},[props.action,props.update])
 
 //when stopTime change and > 0 (to skip first render) set the totalTime using startTime
 	useEffect(()=>{

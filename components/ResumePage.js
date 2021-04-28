@@ -3,9 +3,19 @@ import {View,StyleSheet,Pressable,Modal,FlatList} from 'react-native'
 import Icon from 'react-native-vector-icons/dist/Ionicons'
 import MyText from './MyText.js'
 import ResumeRow from './ResumeRow.js'
+import JobScheduleRow from './JobScheduleRow.js'
+
+function ListFooter(h,money){
+	return (
+		<View style = {styles.footerMain}>
+			<View style = {{flex:1}}><MyText>Total cash: {money}$</MyText></View>
+			<View style = {{flex:1}}><MyText>Total hours: {h}</MyText></View>
+		</View>
+		)
+}
 
 export default function ResumePage(props){
-	const {toggleResumePage,selection} = props
+	const {toggleResumePage,selection,salary,totalH} = props
 	return (
 		<Modal>
 		<View style = {styles.mainView}>
@@ -20,8 +30,9 @@ export default function ResumePage(props){
 			<View style = {styles.contentView}>
 				<FlatList 
 					data = {selection}
-					renderItem = {ResumeRow}
+					renderItem = {({item})=><ResumeRow item = {item} />}
 					keyExtractor = {item => item[0]}
+					ListFooterComponent = {ListFooter(totalH,salary)}
 				/>
 			</View>
 		</View>
@@ -55,5 +66,10 @@ const styles = StyleSheet.create({
 	contentView:{
 		flex:6,
 		marginTop:20,
+	},
+	footerMain:{
+		flex:1,
+		flexDirection:'row',
+		justifyContent:'center',
 	}
 })

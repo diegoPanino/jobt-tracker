@@ -1,14 +1,19 @@
 import React,{useState,useEffect,useRef} from 'react'
-import {SafeAreaView,View,StyleSheet, AppState} from 'react-native'
+import {SafeAreaView,View,StyleSheet, AppState, Pressable} from 'react-native'
 import {connect} from 'react-redux'
-import {addEntryAction,isRunningAction,isNotRunningAction,pauseAction,setStateAction} from '../redux/action.js'
+import {addEntryAction,isRunningAction,isNotRunningAction,pauseAction} from '../redux/action.js'
 import Timer from '../components/Timer.js'
 import TimerButtons from '../components/TimerButtons.js'
 import MyPicker from '../components/MyPicker.js'
 import MyText from '../components/MyText.js'
+import {fromMsToH} from '../utility/Utility.js'
 
-function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunningAction,pauseAction,navigation}){
+function TimerScreen(props){
+	const {jobs,background} = props
+	const {navigation} = props
+	const {addEntryAction,isRunningAction,isNotRunningAction,pauseAction} = props 
 	const [timerState,setTimerState] = useState('stop')
+	const [update,setUpdate] = useState(false)
 	const [selectedJob,setSelectedJob] = useState(null)
 	const prevJob = usePrevious(selectedJob)
 	const [playTime,setPlayTime] = useState(0)
@@ -16,26 +21,29 @@ function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunnin
 	const [appState,setAppState] = useState(appStateRef.current)
 	const jobList=Object.keys(jobs)
 
-	useEffect(()=>{
-		return ()=>{
-			setStateAction(timerState)
-		}
-	},[])
-
-//event run on the first render and on unmount adding, and removing listener for app state
+//event run on everytime background.isRunnin/paused change so the scope stay update when running appStateHandler
 	useEffect(()=>{
 		AppState.addEventListener('change',appStateHandler)
 		return ()=> {
 			AppState.removeEventListener('change',appStateHandler)
 		}
-	},[])
+	},[background.isRunning,background.paused])
+//when coming from background set the state to 'restore' and activate the effect in Timer.js
+//if the timer is started from AddNewEntry.js. the state is already on 'restore', so there is not state update
+//everytime coming from background the timer is showing the right time because playTime is set to background.startTime
+//'update' state is used when timerState is already on 'restore'
+//when going to background change the 'update' state
+//to skip calls to isRunningAction and isPaused in the Timer.js effect, this state update is done only if timerState is not 'pause' or 'play'
 	const appStateHandler = nextAppState =>{
-		if(appStateRef.current === 'active' && nextAppState.match(/inactive|background/))
-			setTimerState('background')
-		if(appStateRef.current.match(/inactive|background/) && nextAppState === 'active'){
+		if(appStateRef.current.match(/inactive|background/) && nextAppState === 'active' && background.isRunning){
 			setTimerState('restore')
 			setPlayTime(background.startTime)
+			if(!background.paused)
+				setUpdate(true)		
 		}
+		else if(timerState !== 'pause' && timerState !== 'play')
+			setUpdate(false)
+
 		appStateRef.current = nextAppState;
     	setAppState(appStateRef.current);
 	}
@@ -78,48 +86,11 @@ function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunnin
 		const date = startTime[2] + '/'+ mm + '/' + startTime[3]
 		const start = startTime[4].slice(0,-3)
 		const end = endTime[4].slice(0,-3)
-		const entry0 = {job:selectedJob,date:'01/01/2021',day:'Mon,01',start:'08:00',end:'18:00',hours:'02:00',isPaid:false}
-		const entry1 = {job:selectedJob,date:'02/02/2021',day:'Tue,02',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
-		const entry2 = {job:selectedJob,date:'03/02/2021',day:'Wed,03',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
-		const entry3 = {job:selectedJob,date:'15/02/2021',day:'Thu,15',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
-		const entry4 = {job:selectedJob,date:'27/02/2021',day:'Fri,27',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
-		const entry5 = {job:selectedJob,date:'01/03/2021',day:'Sat,01',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
-		const entry6 = {job:selectedJob,date:'02/03/2021',day:'Sun,02',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
-		const entry7 = {job:selectedJob,date:'05/03/2021',day:'Mon,05',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
-		const entry8 = {job:selectedJob,date:'01/10/2021',day:'Tue,01',start:'08:10',end:'14:00',hours:'02:00',isPaid:false}
 		const entry = {job:selectedJob,date,day,start,end,hours,isPaid:false}
-	/*	addEntryAction(entry0)
-		addEntryAction(entry1)
-		addEntryAction(entry2)
-		addEntryAction(entry3)
-		addEntryAction(entry4)
-		addEntryAction(entry5)
-		addEntryAction(entry6)
-		addEntryAction(entry7)
 		addEntryAction(entry)
-		addEntryAction(entry8)*/
 	}
 	const setStartTime = time => {
 		setPlayTime(time)
-	}
-	const fromMsToH = millisec =>{
- 		const ms = parseInt((millisec % 1000) / 100)
-	    let seconds = Math.floor((millisec / 1000) % 60)
-	    let minutes = Math.floor((millisec / (1000 * 60)) % 60)
-	    let hours = Math.floor((millisec / (1000 * 60 * 60)) % 24)
-
-	    if(seconds > 30)
-	    	minutes = minutes + 1
-	    if(minutes > 52)
-	    	hours = hours + 1
-
-		minutes= (((minutes + 7.5)/15 | 0) * 15) % 60
-		hours = ((((minutes/105) + .5) | 0) + hours) % 24
-
-		hours = (hours < 10) ? '0' + hours : hours
-		minutes = (minutes < 10) ? "0" + minutes : minutes
-
-	  	return hours + ':' + minutes
 	}
 
 	const onStop = () =>{
@@ -141,7 +112,7 @@ function TimerScreen({jobs,background,addEntryAction,isRunningAction,isNotRunnin
 							values = {jobList} onValueChange = {(val)=>setSelectedJob(val)} selectValue = {jobList[0]} goTo={()=>navigation.navigate('Job')} />
 				</View>
 				<View style = {styles.timerContainer}>
-					<Timer action={timerState} save = {time=>saveTime(time)} entryTimeCreation = {setStartTime}
+					<Timer action={timerState} update = {update} save = {time=>saveTime(time)} entryTimeCreation = {setStartTime}
 							 restore = {background} playAction = {isRunningAction} pauseAction = {pauseAction}/>
 				</View>
 				{ jobList.length ? <TimerButtons state={timerState} background = {background} play={onPlay}
@@ -156,7 +127,7 @@ const mapStateToProps = state => ({
 	jobs: state.jobs,
 	background: state.background,
 })
-export default connect(mapStateToProps,{addEntryAction,isRunningAction,isNotRunningAction,pauseAction,setStateAction})(TimerScreen)
+export default connect(mapStateToProps,{addEntryAction,isRunningAction,isNotRunningAction,pauseAction})(TimerScreen)
 
 const styles = StyleSheet.create({
 	safeArea:{

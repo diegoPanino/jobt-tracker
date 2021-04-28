@@ -5,21 +5,18 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Icon from 'react-native-vector-icons/dist/Ionicons'
 import { Provider } from 'react-redux'
-import {PersistGate} from 'redux-persist/integration/react';
+import {PersistGate} from 'redux-persist/integration/react'
 import {store,persistor} from './redux/store'
 import TimerScreen from './screen/TimerScreen.js'
 import JobsScreen from './screen/JobsScreen.js'
 import ResumeScreen from './screen/ResumeScreen.js'
-import Test from './screen/Test.js'
 
 const Tab = createBottomTabNavigator()
-
 export default function App(){
-  //persistor.purge()
   return (
       <SafeAreaView style = {styles.safeArea}>
-        <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}> 
+        <Provider store = {store}>
+          <PersistGate loading = {null} persistor = {persistor}> 
             <NavigationContainer>
               <Tab.Navigator  screenOptions = {({ route }) => ({
               tabBarIcon: ({ focused, color, size }) => {

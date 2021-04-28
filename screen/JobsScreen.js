@@ -35,6 +35,12 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 			setPressable(true)
 		}
 	}
+	const hourlyPaidHandler = t =>{
+		const onlyNums = t.search(/([^\d|\.|\,])/g)
+		if( onlyNums === -1){
+			setHourlyPaid(t)
+		}
+	}
 	const deleteJob = job =>{
 		deleteJobAction(job)
 	}
@@ -46,7 +52,7 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 					<TextInput style={styles.input} placeholder='Job name' placeholderTextColor='white'
 						 onChangeText={(t)=>setJobName(t)} value={jobName} onSubmitEditing = {()=>hourlyPaidRef.current.focus()} />
 					<TextInput style={styles.input} placeholder='Hourly paid' placeholderTextColor='white'
-						 onChangeText={(t)=>setHourlyPaid(t)} value={hourlyPaid} ref = {hourlyPaidRef} 
+						 onChangeText={(t)=>hourlyPaidHandler(t)} value={hourlyPaid} ref = {hourlyPaidRef} 
 						keyboardType='number-pad' onSubmitEditing = {addJob}/>
 					<MyButton style={({pressed})=>pressedStyle(pressed)} press={addJob} disabled={!pressable}>
 						<MyText style={styles.btnText}>ADD JOB</MyText>

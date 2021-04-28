@@ -6,7 +6,7 @@ import {ADD_JOB,addJobAction,
 		IS_RUNNING,isRunningAction,
 		IS_NOT_RUNNING,isNotRunningAction,
 		IS_PAUSED,pauseAction,
-		SET_STATE,setStateAction
+		SET_STATE,setStateAction,
 } from './action.js'
 
 export const jobReducer = (state={},action) =>{
@@ -47,8 +47,6 @@ export const backgroundReducer = (state={totalTime:0,startTime:0,isRunning:false
 	switch(action.type){
 		case IS_RUNNING : return {...state,startTime: action.payload ? action.payload : state.startTime,isRunning:true,paused:false,state:'play'}
 		case IS_NOT_RUNNING : return {totalTime:0,startTime:0,isRunning:false,paused:false,state:'stop'}
-		case SET_STATE: return {...state,state:action.payload}
-		//case PLAY : return {...state,isRunning:true,paused:false}
 		case IS_PAUSED : return {...state,totalTime:action.payload,paused:true,state:'pause'}
 		default : return state	
 	}

@@ -39,7 +39,7 @@ export const pauseAction = time =>({
 	type:IS_PAUSED,
 	payload: time
 })
-export const setStateAction = state => ({
+export const setStateAction = state =>({
 	type:SET_STATE,
 	payload:state
 })

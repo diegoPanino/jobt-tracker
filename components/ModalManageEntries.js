@@ -38,16 +38,21 @@ function  ModalManageEntries(props){
 	const toggleResume = () =>{
 		resumePage()
 	}
+	const pressedStyle = pressed =>[{
+		backgroundColor: pressed ? '#009ddc' : 'transparent'
+	},styles.closeBtn]
 
 	return (
 		<View style = {styles.mainView}>
 			{!deleteConfirm &&
 				<Animated.View style = {{opacity:fade}}>
 					<View style = {styles.counter}>
-						<MyText style = {styles.textCounter}>{selection.length} selected</MyText>
-						<Pressable style = {styles.closeBtn} onPress = {()=>toggleSelection()}>
-							<Icon name = 'close' size = {15}  color = '#009ddc' />
-						</Pressable>
+						<View style = {styles.btnCounter}>	
+							<MyText style = {styles.textCounter}>{selection.length} selected</MyText>
+							<Pressable style = {({pressed})=>pressedStyle(pressed)} onPress = {()=>toggleSelection()}>
+								<Icon name = 'close' size = {15}  color = '#009ddc' />
+							</Pressable>
+						</View>
 					</View>
 					<View style = {styles.iconsRow}>
 						<View style = {styles.icoContainer}>
@@ -100,12 +105,20 @@ export default connect(null,{toggleIsPaidAction,deleteDatesAction})(ModalManageE
 const styles = StyleSheet.create({
 	mainView:{
 		height:'100%',
+		zIndex:10,
 	},
 	counter:{
 		flex:0.5,
 		width:'98%',
 		justifyContent:'flex-end',
+		alignItems:'center',
 		flexDirection:'row',
+		zIndex:10,
+	},
+	btnCounter:{
+		flex:1,
+		flexDirection:'row',
+		justifyContent:'flex-end'
 	},
 	textCounter:{
 		alignSelf:'center',
@@ -130,6 +143,7 @@ const styles = StyleSheet.create({
 		margin:5,
 		justifyContent:'center',
 		alignItems:'center',
+		zIndex:10,
 	},
 	centerContainer:{
 		borderRightWidth:1,
