@@ -9,7 +9,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width
 const SCREEN_HEIGTH = Dimensions.get('window').height
 
 function  ModalManageEntries(props){
-	const {job,selection,toggleSelection,toggleIsPaidAction,deleteDatesAction,resumePage} = props
+	const {job,selection,toggleSelection,toggleIsPaidAction,deleteDatesAction,resumePage,editPage} = props
 	const [deleteConfirm,setDeleteConfirm] = useState(false)
 	const fade = useRef(new Animated.Value(1)).current
 
@@ -24,6 +24,9 @@ function  ModalManageEntries(props){
 	const toggleIsPaid = () =>{
 		toggleIsPaidAction({job,selection})
 	}
+	const toggleResume = () =>{
+		resumePage()
+	}
 	const toggleMenu = () =>{
 		Animated.timing(fade,{
 			toValue:0,			
@@ -31,12 +34,12 @@ function  ModalManageEntries(props){
 			useNativeDriver:false,
 		}).start(finished => setDeleteConfirm(prevState => !prevState))
 	}
+	const toggleEdit = () =>{
+		editPage()
+	}
 	const deleteSelection = () =>{
 		deleteDatesAction({dates:selection,job:job})
 		toggleSelection()
-	}
-	const toggleResume = () =>{
-		resumePage()
 	}
 	const pressedStyle = pressed =>[{
 		backgroundColor: pressed ? '#009ddc' : 'transparent'
@@ -48,7 +51,7 @@ function  ModalManageEntries(props){
 				<Animated.View style = {{opacity:fade}}>
 					<View style = {styles.counter}>
 						<View style = {styles.btnCounter}>	
-							<MyText style = {styles.textCounter}>{selection.length} selected</MyText>
+							<MyText style = {[styles.textCounter,{fontSize:11}]}>{selection.length} selected</MyText>
 							<Pressable style = {({pressed})=>pressedStyle(pressed)} onPress = {()=>toggleSelection()}>
 								<Icon name = 'close' size = {15}  color = '#009ddc' />
 							</Pressable>
@@ -58,21 +61,29 @@ function  ModalManageEntries(props){
 						<View style = {styles.icoContainer}>
 							<Pressable onPress={toggleIsPaid} >
 								<Icon name = 'logo-usd' size = {50} color = '#009ddc' />				
-								<MyText style = {styles.textCounter}>paid/unpaid</MyText>
+								<MyText style = {styles.textCounter}>PAID/UNPAID</MyText>
 							</Pressable>
 						</View>
 						<View style = {[styles.icoContainer,styles.centerContainer]}>
 							<Pressable onPress = {toggleResume} >
-								<Icon name = 'clipboard-outline' size = {50} color = '#009ddc' />
-								<MyText style = {styles.textCounter}>resume</MyText>
+								<Icon name = 'receipt-outline' size = {50} color = '#009ddc' />
+								<MyText style = {styles.textCounter}>RESUME</MyText>
 							</Pressable>
 						</View>
-						<View style = {styles.icoContainer}>
+						<View style = {[styles.icoContainer,selection.length === 1 ? {borderRightWidth:1,borderColor:'#009ddc'} : {}]}>
 							<Pressable onPress = {toggleMenu}>
 								<Icon name = 'trash-outline' size = {50} color = '#009ddc' />
-								<MyText style = {styles.textCounter}>delete</MyText>
+								<MyText style = {styles.textCounter}>DELETE</MyText>
 							</Pressable>
 						</View>
+						{selection.length === 1 &&
+						<View style = {styles.icoContainer}>
+							<Pressable onPress = {toggleEdit}>
+								<Icon name = 'pencil' size = {50} color = '#009ddc' />
+								<MyText style = {styles.textCounter}>EDIT</MyText>
+							</Pressable>
+						</View>
+						}
 					</View>	
 				</Animated.View>
 			}
@@ -122,7 +133,7 @@ const styles = StyleSheet.create({
 	},
 	textCounter:{
 		alignSelf:'center',
-		fontSize:12,
+		fontSize:9,
 		marginRight:5,
 	},
 	closeBtn:{

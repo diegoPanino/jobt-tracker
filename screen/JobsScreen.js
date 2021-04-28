@@ -1,5 +1,5 @@
 import React,{useState,useRef} from 'react'
-import {SafeAreaView,View,StyleSheet,TextInput,Alert,ScrollView} from 'react-native'
+import {SafeAreaView,View,StyleSheet,TextInput,Alert,ScrollView,TouchableWithoutFeedback, Keyboard} from 'react-native'
 import {connect} from 'react-redux'
 import {addJobAction,deleteJobAction} from '../redux/action.js'
 import MyButton from '../components/MyButton.js'
@@ -11,13 +11,13 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 	const [hourlyPaid,setHourlyPaid] = useState()
 	const [pressable,setPressable] = useState(true)
 	const hourlyPaidRef = useRef(null)
+	const jobNameRef = useRef(null)
 
 	const pressedStyle = pressed =>[{
 		backgroundColor:pressed ? '#f26430' : 'transparent'
 	},styles.btn]
 
 	const addJob = () =>{
-		hourlyPaidRef.current.blur()
 		setPressable(false)
 		if(!(jobName && hourlyPaid)){
 			Alert.alert(
@@ -28,7 +28,8 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 			)
 		}
 		else{
-			const newJob = {[jobName]:{paid:hourlyPaid,entry:[]}}
+			const newJob = {[jobName]:{paid:Number(hourlyPaid),entry:[]}}
+			console.log(newJob)
 			addJobAction(newJob)
 			setJobName()
 			setHourlyPaid()
@@ -36,35 +37,48 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 		}
 	}
 	const hourlyPaidHandler = t =>{
-		const onlyNums = t.search(/([^\d|\.|\,])/g)
-		if( onlyNums === -1){
-			setHourlyPaid(t)
+		const onlyNums = t.search(/([^\d\.\,])/g)
+		if( onlyNums === -1 ){
+			const cleanPaid = t.replace(/\,|\.\,|\,\.|\.{2,}|\.{2,}/g,'.')
+			if(cleanPaid || cleanPaid == ''){
+				if(cleanPaid.indexOf('.') === cleanPaid.lastIndexOf('.'))
+					setHourlyPaid(cleanPaid)
+			}
 		}
 	}
 	const deleteJob = job =>{
 		deleteJobAction(job)
 	}
+	onSubmitEditingHandler = caller =>{
+		if(jobName && hourlyPaid)
+			addJob()
+		else{
+			caller ? jobNameRef.current.focus() : hourlyPaidRef.current.focus()
+		}
+	}
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
-			<View style={styles.mainView}>
-				<View style={styles.jobForm}>
-					<TextInput style={styles.input} placeholder='Job name' placeholderTextColor='white'
-						 onChangeText={(t)=>setJobName(t)} value={jobName} onSubmitEditing = {()=>hourlyPaidRef.current.focus()} />
-					<TextInput style={styles.input} placeholder='Hourly paid' placeholderTextColor='white'
-						 onChangeText={(t)=>hourlyPaidHandler(t)} value={hourlyPaid} ref = {hourlyPaidRef} 
-						keyboardType='number-pad' onSubmitEditing = {addJob}/>
-					<MyButton style={({pressed})=>pressedStyle(pressed)} press={addJob} disabled={!pressable}>
-						<MyText style={styles.btnText}>ADD JOB</MyText>
-					</MyButton>
+		<TouchableWithoutFeedback onPress = {()=>Keyboard.dismiss()}>
+			<SafeAreaView style={styles.safeArea}>
+				<View style={styles.mainView}>
+					<View style={styles.jobForm}>
+						<TextInput style={styles.input} placeholder='Job name' placeholderTextColor='white' ref = {jobNameRef}
+							 onChangeText={(t)=>setJobName(t)} value={jobName} onSubmitEditing = {()=>onSubmitEditingHandler(0)} />
+						<TextInput style={styles.input} placeholder='Hourly paid' placeholderTextColor='white'
+							 onChangeText={(t)=>hourlyPaidHandler(t)} value={hourlyPaid} ref = {hourlyPaidRef} 
+							keyboardType='number-pad' onSubmitEditing = {()=>onSubmitEditingHandler(1)}/>
+						<MyButton style={({pressed})=>pressedStyle(pressed)} press={addJob} disabled={!pressable}>
+							<MyText style={styles.btnText}>ADD JOB</MyText>
+						</MyButton>
+					</View>
+					<View style={styles.listContainer}>
+						<ScrollView style={styles.list}>
+							{Object.keys(jobs).map((job,i)=> { return( <JobRow key={i} jobName={job} jobDel = {(j)=>deleteJob(j)} /> )} ) }
+						</ScrollView>
+					</View>
 				</View>
-				<View style={styles.listContainer}>
-					<ScrollView style={styles.list}>
-						{Object.keys(jobs).map((job,i)=> { return( <JobRow key={i} jobName={job} jobDel = {(j)=>deleteJob(j)} /> )} ) }
-					</ScrollView>
-				</View>
-			</View>
-		</SafeAreaView>
+			</SafeAreaView>
+		</TouchableWithoutFeedback>
 		)
 }
 const mapStateToProps = state => ({

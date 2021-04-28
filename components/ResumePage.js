@@ -8,7 +8,7 @@ import JobScheduleRow from './JobScheduleRow.js'
 function ListFooter(h,money){
 	return (
 		<View style = {styles.footerMain}>
-			<View style = {{flex:1}}><MyText>Total cash: {money}$</MyText></View>
+			<View style = {{flex:1}}><MyText>Total cash: {Number(money).toFixed(2)}$</MyText></View>
 			<View style = {{flex:1}}><MyText>Total hours: {h}</MyText></View>
 		</View>
 		)

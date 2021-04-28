@@ -8,8 +8,6 @@ export default function ResumeRow(props){
 	const dateTmp = item[0].split('/')
 	const date = dateTmp[0]+'/'+dateTmp[1]+'/'+dateTmp[2][2]+dateTmp[2][3]
 	const hours = item[1][1] ? sumH(item[1][0].hours,item[1][1].hours) : item[1][0].hours
-	console.log('item',item)
-	console.log('item1',item[1])
 
 	if(item[1].length > 2){
 		return (

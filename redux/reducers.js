@@ -7,6 +7,7 @@ import {ADD_JOB,addJobAction,
 		IS_NOT_RUNNING,isNotRunningAction,
 		IS_PAUSED,pauseAction,
 		SET_STATE,setStateAction,
+		EDIT_ENTRY,editEntryAction,
 } from './action.js'
 
 export const jobReducer = (state={},action) =>{
@@ -24,6 +25,19 @@ export const jobReducer = (state={},action) =>{
 			newState[job].entry = {...newState[job].entry,[date]:[...newState[job].entry[date] || [],jobEntry]} 
 			return newState
 		}
+		case EDIT_ENTRY:{
+			const newState = {...state}
+			const {job,date,...entry} = action.payload
+			const newEntry = Object.values(entry)
+			newState[job].entry[date] = newEntry
+			return newState
+		}
+		case DELETE_DATES:{
+			const {job,dates} = action.payload
+			const newState = {...state}//JSON.parse(JSON.stringify(state)) //shallow copy, should be deep with lodash
+			dates.map(data => delete newState[job].entry[data])
+			return newState
+		}
 		case TOGGLE_IS_PAID:{
 			const {job,...dates} = action.payload
 			const newState = {...state}
@@ -32,12 +46,6 @@ export const jobReducer = (state={},action) =>{
 					day.isPaid = !day.isPaid
 				})
 			})
-			return newState
-		}
-		case DELETE_DATES:{
-			const {job,dates} = action.payload
-			const newState = {...state}//JSON.parse(JSON.stringify(state)) //shallow copy, should be deep with lodash
-			dates.map(data => delete newState[job].entry[data])
 			return newState
 		}
 		default: return state

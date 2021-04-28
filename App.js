@@ -22,7 +22,7 @@ export default function App(){
               tabBarIcon: ({ focused, color, size }) => {
                 let iconName
                 if (route.name === 'Timer') {
-                  iconName = focused ? 'alarm-sharp' : 'alarm-outline'
+                  iconName = focused ? 'md-timer-sharp' : 'md-timer-outline'
                 } else if (route.name === 'Job') {
                   iconName = focused ? 'briefcase-sharp' : 'briefcase-outline'
                 } else if(route.name === 'Resume'){

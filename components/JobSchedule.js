@@ -1,9 +1,11 @@
 import React,{useState,useEffect,useRef} from 'react'
 import {View, StyleSheet, SectionList,Modal,Animated,Pressable} from 'react-native'
+import {BlurView} from "@react-native-community/blur"
 import MyText from './MyText.js'
 import JobScheduleRow from './JobScheduleRow.js'
 import ModalManageEntries from './ModalManageEntries.js'
 import ResumePage from './ResumePage.js'
+import EditPage from './EditPage.js'
 import {getMoneyfromH,transformDateHeader,sumH} from '../utility/Utility.js'
 
 export default function JobSchedule(props){
@@ -14,6 +16,7 @@ export default function JobSchedule(props){
 	const [resumeSelection,setResumeSelection] = useState([])
 	const [showModal,setShowModal] = useState(false)
 	const [showResumePage, setShowResumePage] = useState(false)
+	const [showEditPage,setShowEditPage] = useState(false)
 	const [deselectAll,setDeselectAll] = useState(false)
 	const [selection$,setSelection$] = useState(0)
 	const [selectionH,setSelectionH] = useState('00:00')
@@ -128,7 +131,7 @@ export default function JobSchedule(props){
 			return {
 				day:el[0],
 				data:el[1],
-				money:money.reduce((acc,res)=>{return acc + res},0),
+				money:Number(money.reduce((acc,res)=>{return acc + res},0)).toFixed(0),
 				key:i
 			}
 		})
@@ -144,6 +147,9 @@ export default function JobSchedule(props){
 	const toggleResumePage = () =>{
 		setShowResumePage(prevState => !prevState)
 	}
+	const toggleEditPage = () =>{
+		setShowEditPage(prevState => !prevState)
+	}
 	const pressedStyle = pressed =>[{
 		backgroundColor: pressed ? '#009ddc' : 'transparent'
 	},styles.closeBtn]
@@ -152,8 +158,8 @@ export default function JobSchedule(props){
 		<View style={styles.mainView}>
 		{showResumePage && 
 				<ResumePage toggleResumePage = {toggleResumePage} selection = {resumeSelection} salary = {selection$} totalH = {selectionH} />
-			}
-			{jobLoaded &&
+		}
+		{jobLoaded &&
 			<View style={styles.contentView}>
 				{!paidUnpaidSelection.length && 
 					<View style = {styles.unpaidSel}>
@@ -189,8 +195,15 @@ export default function JobSchedule(props){
 			{showModal && 
 				<Animated.View style={[styles.modal,{opacity:fadeIn}]}>
 					<ModalManageEntries selection = {itemSelection} job={selectedJob}
-								toggleSelection = {toggleSelection} resumePage = {toggleResumePage} />
+								toggleSelection = {toggleSelection} resumePage = {toggleResumePage} editPage = {toggleEditPage} />
 				</Animated.View>
+			}
+			{showEditPage &&
+				<>
+				<BlurView style={styles.absolute}
+         				 blurType="light" blurAmount={5} />
+				<EditPage toggleEditPage = {toggleEditPage} itemSelection = {itemSelection} selectedJob = {selectedJob} />
+				</>
 			}
 		</View>
 		)
@@ -254,5 +267,12 @@ const styles = StyleSheet.create({
 		flexDirection:'row',
 		justifyContent:'space-between',
 		margin:2,
+	},
+	absolute:{
+		position:'absolute',
+		top:0,
+		bottom:0,
+		right:0,
+		left:0,
 	}
 })
