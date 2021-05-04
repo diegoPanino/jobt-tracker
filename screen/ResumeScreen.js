@@ -7,11 +7,14 @@ import {addEntryAction,isRunningAction} from '../redux/action.js'
 import MyPicker from '../components/MyPicker.js'
 import JobSchedule from '../components/JobSchedule.js'
 import AddNewEntry from '../components/AddNewEntry.js'
+import EditPage from '../components/EditPage.js'
 
 function ResumeScreen({jobs,background,isRunningAction,addEntryAction,navigation}){
 	const [selectedJob,setSelectedJob] = useState(null)
 	const [showNewEntry,setShowNewEntry] = useState(false)
 	const [loaded,setLoaded] = useState(false)
+	const [showEditPage,setShowEditPage] = useState(false)
+	const [editSelection, setEditSelection] = useState(null)
 	const jobList=Object.keys(jobs)
 
 	useEffect(()=>{
@@ -20,6 +23,12 @@ function ResumeScreen({jobs,background,isRunningAction,addEntryAction,navigation
 		else
 			setLoaded(false)
 	},[jobs])
+
+	const toggleEditPage = itemSelection =>{
+		if(itemSelection)
+			setEditSelection(itemSelection)
+		setShowEditPage(prevState => !prevState)
+	}
 
 	onSaveEntry = data =>{
 		const {date,day,start,end,hours,isPaid} = data
@@ -37,8 +46,7 @@ function ResumeScreen({jobs,background,isRunningAction,addEntryAction,navigation
 	}
 	else{
 	return (
-		<SafeAreaView style={styles.safeArea}>
-			
+		<SafeAreaView style={styles.safeArea}>	
 			<View style={styles.mainView}>
 				<View style = {styles.pickerContainer}>
 					<MyPicker containerStyle = {styles.pickerStyle} pickerItemStyle={styles.pickerItemStyle} textStyle={styles.pickerText} 
@@ -46,21 +54,28 @@ function ResumeScreen({jobs,background,isRunningAction,addEntryAction,navigation
 				</View>
 				{(jobs && selectedJob) &&
 				<View style={styles.scheduleView}>
-					<JobSchedule selectedJob = {selectedJob} jobs = {jobs} />
+					<JobSchedule selectedJob = {selectedJob} jobs = {jobs} toggleEditPage = {(selection)=>toggleEditPage(selection)} />
 				</View>	
 				}
 				<View style = {styles.btnContainer}>
 					<Pressable onPress = {()=>setShowNewEntry(true)}>
-						<Icon name = 'add-circle-outline' size = {50} color='#6761a8' />
+						<Icon name = 'add-circle-outline' size = {50} color='#009ddc' />
 					</Pressable>
 				</View>
 				{(showNewEntry) &&
-					<>
+				<>
 					<BlurView style={styles.absolute}
          				 blurType="light" blurAmount={5} />
 					<AddNewEntry hide = {()=>{setShowNewEntry(false)}} save = {(entry)=>onSaveEntry(entry)} 
 								 background = {background} selectedJob = {selectedJob} action = {isRunningAction}/>
-					</>
+				</>
+				}
+				{showEditPage &&
+				<>
+					<BlurView style={styles.absolute}
+	         				 blurType="light" blurAmount={5} />
+					<EditPage toggleEditPage = {toggleEditPage} itemSelection = {editSelection} selectedJob = {selectedJob} />
+				</>
 				}
 			</View>
 		</SafeAreaView>
@@ -75,7 +90,7 @@ export default connect(mapStateToProps,{addEntryAction,isRunningAction})(ResumeS
 const styles = StyleSheet.create({
 	safeArea:{
 		flex:1,
-		backgroundColor:'#2a2d34'
+		backgroundColor:'#2a2d34',
 	},
 	mainView:{
 		flex:1,

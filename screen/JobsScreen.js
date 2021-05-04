@@ -29,7 +29,6 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 		}
 		else{
 			const newJob = {[jobName]:{paid:Number(hourlyPaid),entry:[]}}
-			console.log(newJob)
 			addJobAction(newJob)
 			setJobName()
 			setHourlyPaid()

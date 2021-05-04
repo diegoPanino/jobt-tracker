@@ -9,14 +9,13 @@ import EditPage from './EditPage.js'
 import {getMoneyfromH,transformDateHeader,sumH} from '../utility/Utility.js'
 
 export default function JobSchedule(props){
-	const {jobs,selectedJob} = props
+	const {jobs,selectedJob,toggleEditPage} = props
 	const [jobLoaded,setJobLoaded] = useState(false)
 	const [itemSelection,setItemSelection] = useState([])
 	const [paidUnpaidSelection,setPaidUnpaidSelection] = useState([])
 	const [resumeSelection,setResumeSelection] = useState([])
 	const [showModal,setShowModal] = useState(false)
 	const [showResumePage, setShowResumePage] = useState(false)
-	const [showEditPage,setShowEditPage] = useState(false)
 	const [deselectAll,setDeselectAll] = useState(false)
 	const [selection$,setSelection$] = useState(0)
 	const [selectionH,setSelectionH] = useState('00:00')
@@ -34,23 +33,10 @@ export default function JobSchedule(props){
 	},[jobs])
 
 	useEffect(()=>{
-		if(itemSelection.length){
-			setShowModal(true)
-			Animated.timing(fadeIn,{
-				toValue:1,
-				duration:150,
-				useNativeDriver:true
-			}).start()	
-			setDeselectAll(false)			
-		}
-		else{
-			Animated.timing(fadeIn,{
-				toValue:0,
-				duration:150,
-				useNativeDriver:true
-			}).start(finished=>setShowModal(false))
-			setDeselectAll(true)
-		}
+		if(itemSelection.length)
+			modalAppear()
+		else
+			modalDisappear()
 	},[itemSelection])
 	useEffect(()=>{
 		setItemSelection(paidUnpaidSelection)
@@ -147,8 +133,26 @@ export default function JobSchedule(props){
 	const toggleResumePage = () =>{
 		setShowResumePage(prevState => !prevState)
 	}
-	const toggleEditPage = () =>{
-		setShowEditPage(prevState => !prevState)
+	const toggleEPage = () =>{
+		toggleEditPage(itemSelection)
+		setItemSelection([])
+	}
+	const modalAppear = () =>{
+		setShowModal(true)
+		Animated.timing(fadeIn,{
+			toValue:1,
+			duration:150,
+			useNativeDriver:true
+		}).start()	
+		setDeselectAll(false)
+	}
+	const modalDisappear = () =>{
+		Animated.timing(fadeIn,{
+			toValue:0,
+			duration:150,
+			useNativeDriver:true
+		}).start(finished=>setShowModal(false))
+		setDeselectAll(true)
 	}
 	const pressedStyle = pressed =>[{
 		backgroundColor: pressed ? '#009ddc' : 'transparent'
@@ -192,18 +196,11 @@ export default function JobSchedule(props){
 				/>
 			</View>
 			}
-			{showModal && 
+			{(showModal) && 
 				<Animated.View style={[styles.modal,{opacity:fadeIn}]}>
 					<ModalManageEntries selection = {itemSelection} job={selectedJob}
-								toggleSelection = {toggleSelection} resumePage = {toggleResumePage} editPage = {toggleEditPage} />
+								toggleSelection = {toggleSelection} resumePage = {toggleResumePage} editPage = {toggleEPage} />
 				</Animated.View>
-			}
-			{showEditPage &&
-				<>
-				<BlurView style={styles.absolute}
-         				 blurType="light" blurAmount={5} />
-				<EditPage toggleEditPage = {toggleEditPage} itemSelection = {itemSelection} selectedJob = {selectedJob} />
-				</>
 			}
 		</View>
 		)

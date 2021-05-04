@@ -1,12 +1,12 @@
 import React,{useState,useEffect,useRef} from 'react'
-import {View,StyleSheet,Pressable} from 'react-native'
+import {View,StyleSheet,Pressable,Alert} from 'react-native'
 import moment from 'moment'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Icon from 'react-native-vector-icons/dist/Ionicons'
 import MyText from './MyText.js'
 
 export default function EditRow(props){
-	const {date,item,i,showSaveBtn} = props
+	const {date,item,i,showSaveBtn,showDeleteBtn,deleteRow} = props
 	const splitDate = date.split('/')
 	const selectDay = {years:splitDate[2],months:splitDate[1]-1,days:splitDate[0]}
 	const splitStart = item.start.split(':')
@@ -50,6 +50,14 @@ export default function EditRow(props){
 			setEnd(timestamp)
 		}
 	}
+	const onDeleteRow = () =>{
+		Alert.alert(
+			'Confirm delete',
+			'Delete selected entry?',
+			[{text:'Go Back',style:'cancel'},
+		     {text:'Confirm',onPress: ()=>{deleteRow({date,i})}}
+			])
+	}
 	return(
 		<View style = {styles.mainView} key = {item.day+item.start+item.end}>
 			<View style = {styles.start}>
@@ -68,6 +76,12 @@ export default function EditRow(props){
 				</Pressable>
 				{showEnd && <DateTimePicker mode = 'time' value = {end} onChange = {(e)=>onEndChange(e)} is24h = {true} />}
 			</View>
+			{ (showDeleteBtn !== 1) &&
+			<Pressable style = {styles.icoView} onPress = {onDeleteRow}>
+				<Icon style = {styles.ico} name = "trash" size = {18} color = "#F26430" />
+			</Pressable>	
+			}
+			
 		</View>
 		)
 }
@@ -83,11 +97,16 @@ const styles = StyleSheet.create({
 		borderLeftWidth:1,
 		borderColor:'#6761A8'
 	},
-	end:{
+	end:{	
 		flexDirection:'row',
 		padding:20,
 		borderRightWidth:1,
 		borderColor:'#6761A8'
+	},
+	icoView:{
+		justifyContent:'center'
+	},	
+	ico:{
 	},
 	headText:{
 		fontSize:10,

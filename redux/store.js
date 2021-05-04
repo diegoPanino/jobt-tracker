@@ -27,5 +27,5 @@ const onEndRehydrationHandler=()=>{
 }
 
 const persistedReducer = persistReducer(persistConfig,rootReducer);
-export const store = createStore(persistedReducer,devToolsEnhancer());
+export const store = createStore(persistedReducer);
 export const persistor = persistStore(store,{},onEndRehydrationHandler);

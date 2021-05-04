@@ -34,7 +34,7 @@ export default function App(){
               tabBarOptions = {{
                 activeTintColor: '#009ddc',
                 inactiveTintColor: '#6761a8',
-                style:{backgroundColor:'#2a2d34'},
+                style:{backgroundColor:'#2a2d34',borderTopWidth:1,borderTopColor:'#6761A8',borderBottomWidth:1,borderBottomColor:'#6761A8'},
                 showLabel:false,
                 keyboardHidesTabBar:true
               }}>

@@ -8,7 +8,7 @@ import JobScheduleRow from './JobScheduleRow.js'
 function ListFooter(h,money){
 	return (
 		<View style = {styles.footerMain}>
-			<View style = {{flex:1}}><MyText>Total cash: {Number(money).toFixed(2)}$</MyText></View>
+			<View style = {{flex:1}}><MyText>Total cash: {Number(money).toFixed()}$</MyText></View>
 			<View style = {{flex:1}}><MyText>Total hours: {h}</MyText></View>
 		</View>
 		)
@@ -21,7 +21,7 @@ export default function ResumePage(props){
 		<View style = {styles.mainView}>
 			<View style = {styles.titleView}>
 				<View style = {styles.textTitleView}>
-					<MyText>Resume Page</MyText>
+					<MyText>SALARY & HOURS</MyText>
 				</View>
 					<Pressable style = {styles.closeIco} onPress = {toggleResumePage}>
 						<Icon name = 'close' size = {50} color = 'white' /> 

@@ -125,7 +125,7 @@ export default function AddNewEntry({hide,save,background,action,selectedJob}){
 			</View>
 			<View style = {styles.content}>
 				<CalendarPicker textStyle = {styles.text} selectedDayColor = '#6761A8' scrollable = {true} dayLabelsWrapper = {styles.daysLaberWrap}
-					todayBackgroundColor = 'transparent' todayTextStyle = {styles.text} onDateChange = {date => onDateChangeHandler(date)} startFromMonday = {true} />
+					todayBackgroundColor = '#6761A855' todayTextStyle = {styles.text} onDateChange = {date => onDateChangeHandler(date)} startFromMonday = {true} />
 				{showPickers && <Animated.View style = {{opacity:fade}}>
 					<View style = {styles.pickerLine}>
 						<View style = {styles.pickerBlock}>

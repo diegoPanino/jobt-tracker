@@ -4,13 +4,13 @@ import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/dist/Ionicons'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import moment from 'moment'
-import {editEntryAction} from '../redux/action.js'
+import {editEntryAction,deleteEntryAction} from '../redux/action.js'
 import MyText from './MyText.js'
 import {subH} from '../utility/Utility.js'
 import EditRow from './EditRow.js'
 
 function EditPage(props){
-	const {itemSelection,selectedJob,toggleEditPage,editEntryAction} = props
+	const {itemSelection,selectedJob,toggleEditPage,editEntryAction,deleteEntryAction} = props
 	const item = itemSelection[0] 
 	const {jobs} = props
 	const [showSaveBtn,setShowSaveBtn] = useState(false)
@@ -29,11 +29,16 @@ function EditPage(props){
 		stateCopy[entry.i] = {...stateCopy[entry.i],start,end,hours}
 		setEditedEntry(stateCopy)
 	}
+	const onDeleteRowHandler = entry =>{
+		const {date,i} = entry
+		deleteEntryAction({date,i,selectedJob})
+	}
+
 	return (
 		<View style = {styles.mainView}>
 			<View style =  {styles.titleView}>
 				<View style = {styles.textTitleView}>
-					<MyText>Edit Page</MyText>
+					<MyText>EDIT TIME</MyText>
 				</View>
 				<Pressable style = {styles.closeIco} onPress = {toggleEditPage}>
 					<Icon name = 'close' size = {50} color = 'white' /> 
@@ -52,7 +57,11 @@ function EditPage(props){
 					</View>
 				</View>
 				{jobs[selectedJob].entry[item].map((entry,i)=>{ 
-					return <EditRow date = {item} item = {entry} i = {i} showSaveBtn = {entry=>saveBtnHandler(entry)} key = {i}/>}
+					return <EditRow date = {item} item = {entry} i = {i} 
+									deleteRow = {entry => onDeleteRowHandler(entry)}
+									showSaveBtn = {entry=>saveBtnHandler(entry)}
+									showDeleteBtn = {jobs[selectedJob].entry[item].length}
+									key = {i}/>}
 					)}
 			</View>
 			{showSaveBtn && 
@@ -69,20 +78,18 @@ function EditPage(props){
 const mapStateToPros = state =>({
 	jobs:state.jobs,
 })
-export default connect(mapStateToPros,{editEntryAction})(EditPage)
+export default connect(mapStateToPros,{editEntryAction,deleteEntryAction})(EditPage)
 const styles = StyleSheet.create({
 	mainView:{
-		flex:1,
 		position:'absolute',
 		top:0,
-		left:0,
+		left:'1%',
 		backgroundColor:'#2a2d34',
-		zIndex:10,
-		padding:5,
+		zIndex:50,
+		padding:10,
 		paddingTop:15,
 	},
 	titleView:{
-		
 		flexDirection:'row',
 		borderBottomWidth:1,
 		borderColor:'#6761A8'

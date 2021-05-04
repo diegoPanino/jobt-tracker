@@ -8,6 +8,7 @@ export const IS_NOT_RUNNING = 'IS_NOT_RUNNING'
 export const IS_PAUSED = 'IS_PAUSED'
 export const SET_STATE = 'SET_STATE'
 export const EDIT_ENTRY = 'EDIT_ENTRY'
+export const DELETE_ENTRY = 'DELETE_ENTRY'
 
 export const addJobAction = job => ({
 	type:ADD_JOB,
@@ -46,5 +47,9 @@ export const setStateAction = state =>({
 })
 export const editEntryAction = entry =>({
 	type:EDIT_ENTRY,
+	payload:entry
+})
+export const deleteEntryAction = entry =>({
+	type:DELETE_ENTRY,
 	payload:entry
 })

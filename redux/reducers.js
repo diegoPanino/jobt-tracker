@@ -8,6 +8,7 @@ import {ADD_JOB,addJobAction,
 		IS_PAUSED,pauseAction,
 		SET_STATE,setStateAction,
 		EDIT_ENTRY,editEntryAction,
+		DELETE_ENTRY,deleteEntryAction,
 } from './action.js'
 
 export const jobReducer = (state={},action) =>{
@@ -30,6 +31,14 @@ export const jobReducer = (state={},action) =>{
 			const {job,date,...entry} = action.payload
 			const newEntry = Object.values(entry)
 			newState[job].entry[date] = newEntry
+			return newState
+		}
+		case DELETE_ENTRY:{
+			const {date,i,selectedJob} = action.payload
+			const newState = {...state}
+			newState[selectedJob].entry[date] = newState[selectedJob].entry[date].filter((entry,index) =>{
+				return i !== index
+			})
 			return newState
 		}
 		case DELETE_DATES:{
