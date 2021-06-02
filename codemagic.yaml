@@ -6,6 +6,6 @@ workflows:
             xcode: latest
             cocoapods: default
         scripts:
-            - xcodebuild build -workspace "jobtracker.xcworkspace" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+            - xcodebuild build -workspace "jobtracker.xcworkspace" -scheme "MyReact" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
         artifacts:
             - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
