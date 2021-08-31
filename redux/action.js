@@ -1,5 +1,7 @@
 export const ADD_JOB = 'ADD_JOB'
 export const DELETE_JOB = 'DELETE_JOB'
+export const EDIT_JOB_NAME = 'EDIT_JOB_NAME'
+export const EDIT_JOB_PAID = 'EDIT_JOB_PAID'
 export const ADD_ENTRY = 'ADD_ENTRY'
 export const TOGGLE_IS_PAID = 'TOGGLE_IS_PAID'
 export const DELETE_DATES = 'DELETE_DATES'
@@ -16,6 +18,14 @@ export const addJobAction = job => ({
 })
 export const deleteJobAction = job =>({
 	type:DELETE_JOB,
+	payload:job
+})
+export const editJobNameAction = job =>({
+	type:EDIT_JOB_NAME,
+	payload:job
+})
+export const editJobPaidAction = job =>({
+	type:EDIT_JOB_PAID,
 	payload:job
 })
 export const addEntryAction = entry =>({

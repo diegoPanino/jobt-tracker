@@ -1,15 +1,17 @@
 import React,{useState,useRef} from 'react'
 import {SafeAreaView,View,StyleSheet,TextInput,Alert,ScrollView,TouchableWithoutFeedback, Keyboard} from 'react-native'
+import {BlurView} from "@react-native-community/blur"
 import {connect} from 'react-redux'
-import {addJobAction,deleteJobAction} from '../redux/action.js'
+import {addJobAction,deleteJobAction,editJobNameAction,editJobPaidAction} from '../redux/action.js'
 import MyButton from '../components/MyButton.js'
 import MyText from '../components/MyText.js'
 import JobRow from '../components/JobRow.js'
 
-function JobsScreen({jobs,addJobAction,deleteJobAction}){
+function JobsScreen({jobs,addJobAction,deleteJobAction,editJobNameAction,editJobPaidAction}){
 	const [jobName,setJobName] = useState()
 	const [hourlyPaid,setHourlyPaid] = useState()
 	const [pressable,setPressable] = useState(true)
+	const [blur,setBlur] = useState(false)
 	const hourlyPaidRef = useRef(null)
 	const jobNameRef = useRef(null)
 
@@ -48,6 +50,12 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 	const deleteJob = job =>{
 		deleteJobAction(job)
 	}
+	const editJob = job =>{
+		if(Object.keys(job).length > 2)
+			editJobNameAction(job)
+		else
+			editJobPaidAction(job)
+	}
 	onSubmitEditingHandler = caller =>{
 		if(jobName && hourlyPaid)
 			addJob()
@@ -72,18 +80,25 @@ function JobsScreen({jobs,addJobAction,deleteJobAction}){
 					</View>
 					<View style={styles.listContainer}>
 						<ScrollView style={styles.list}>
-							{Object.keys(jobs).map((job,i)=> { return( <JobRow key={i} jobName={job} jobDel = {(j)=>deleteJob(j)} /> )} ) }
+							{Object.keys(jobs).map((job,i)=> { return( <JobRow 	key={i} 
+																				jobName={job}
+																				salary={jobs[job].paid}
+																				jobDel = {(j)=>deleteJob(j)}
+																				jobEdit = {(j)=>editJob(j)}
+																				blur = {()=>setBlur(prev => !prev)} /> )} ) }
 						</ScrollView>
 					</View>
 				</View>
+				{blur && <BlurView style={styles.absolute} blurType="light" blurAmount={5} />}
 			</SafeAreaView>
+
 		</TouchableWithoutFeedback>
 		)
 }
 const mapStateToProps = state => ({
 	jobs:state.jobs
 })
-export default connect(mapStateToProps,{addJobAction,deleteJobAction})(JobsScreen)
+export default connect(mapStateToProps,{addJobAction,deleteJobAction,editJobNameAction,editJobPaidAction})(JobsScreen)
 
 const styles = StyleSheet.create({
 	safeArea:{
@@ -131,5 +146,12 @@ const styles = StyleSheet.create({
 		borderColor:'#6761a8',
 		borderRadius:5,
 
-	}
+	},
+	absolute:{
+		position:'absolute',
+		top:0,
+		bottom:0,
+		left:0,
+		right:0,
+	},
 })

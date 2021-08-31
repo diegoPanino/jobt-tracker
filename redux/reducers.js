@@ -9,6 +9,8 @@ import {ADD_JOB,addJobAction,
 		SET_STATE,setStateAction,
 		EDIT_ENTRY,editEntryAction,
 		DELETE_ENTRY,deleteEntryAction,
+		EDIT_JOB_NAME,editJobNameAction,
+		EDIT_JOB_PAID,editJobPaidAction,
 } from './action.js'
 
 export const jobReducer = (state={},action) =>{
@@ -18,6 +20,19 @@ export const jobReducer = (state={},action) =>{
 			const {[action.payload]:value,...newState} = state
 			return newState
 		} 
+		case EDIT_JOB_NAME:{
+			const {name,newName,paid} = action.payload
+			const newState = {...state}
+			newState[newName] = {...newState[name],paid:Number(paid)}
+			delete newState[name]
+			return newState
+		}
+		case EDIT_JOB_PAID:{
+			const {name,paid} = action.payload
+			const newState = {...state}
+			newState[name].paid = Number(paid)
+			return newState
+		}
 		case ADD_ENTRY: {
 			const {payload} = action
 			const {job,date,...jobEntry} = payload
