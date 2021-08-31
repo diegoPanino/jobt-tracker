@@ -1,0 +1,11 @@
+# Workflow setup for building Native iOS project
+workflows:
+    ios-project: # workflow ID
+        name: iOS project # workflow name
+        environment:
+            xcode: latest
+            cocoapods: default
+        scripts:
+            - xcodebuild build -workspace "jobtracker.xcworkspace" -scheme "MyReact" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+        artifacts:
+            - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
